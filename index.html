@@ -192,6 +192,7 @@ if(document.documentElement.classList.contains("locked")) setTimeout(function(){
     <button class="ghost" id="dlJson">Visa istorija (JSON)</button>
   </div>
 </div>
+<div id="secretBox"></div>
 <p class="status" id="status"></p>
 </div>
 
@@ -386,8 +387,6 @@ function icon(id){ return `<svg class="ico" viewBox="0 0 64 64" aria-hidden="tru
 const SECRET_UNTIL = Date.parse("2026-11-16T22:00:00Z"); // vidurnaktis Vilniuje
 const secretOn = ()=>Date.now()<SECRET_UNTIL;
 const SECTIONS = [
- {t:"🤫 Slaptas punktas", secret:true, items:[
-  ["gandonai","Gandonai: įvairių dydžių, spalvų ir skonių","Kas pasirūpins?"]]},
  {t:"🔧 Minimalus remonto rinkinys", items:[
   ["galvutes","Mažas galvučių ir atsuktuvų rinkinys","Atsukti, priveržti, pritvirtinti"],
   ["reples","Universalios replės","Suimti, patraukti, užspausti"],
@@ -414,7 +413,9 @@ const SECTIONS = [
   ["usb","USB laidai (mažiausiai 2 vnt.)","Pakrovėjus turbūt visi turės savo"],
   ["prikurke","USB kištukas į 12 V prikurkę","Krauti telefonus važiuojant"]]},
  {t:"📋 Užduotys prieš kelionę", items:[
-  ["draudimas","Techninės pagalbos draudimas Europoje","Ar galioja tokio amžiaus autui, ar apima transportavimą iš užsienio"]]}
+  ["draudimas","Techninės pagalbos draudimas Europoje","Ar galioja tokio amžiaus autui, ar apima transportavimą iš užsienio"]]},
+ {t:"🤫 Slaptas punktas", secret:true, items:[
+  ["gandonai","Gandonai: įvairių dydžių","Kas pasirūpins?"]]}
 ];
 const ITEMS = {}; SECTIONS.forEach(s=>s.items.forEach(i=>ITEMS[i[0]]={id:i[0],name:i[1],why:i[2],section:s.t,secret:!!s.secret}));
 const shown = it=>it && (!it.secret || secretOn());
@@ -602,9 +603,10 @@ function stateFor(id){
 }
 
 function render(){
-  let html="", done=0, total=0;
+  let html="", done=0, total=0, mainHtml="";
   for(const s of SECTIONS){
     if(s.secret && !secretOn()) continue;
+    if(s.secret){ mainHtml=html; html="" }
     html+=`<h2>${esc(s.t)}</h2>`;
     if(s.secret) html+=`<div class="secret">⏳ Šitas punktas matomas tik šiandien iki vidurnakčio, paskui dingsta be pėdsakų. Turit suspėti užsirašyti! Liko <b class="cd">${countdown()}</b></div>`;
     for(const [id] of s.items){
@@ -631,7 +633,8 @@ function render(){
   const open=[...document.querySelectorAll("details[open]")].map(d=>d.closest(".item")?.dataset.id);
   const notes={}; document.querySelectorAll("[data-note]").forEach(i=>{if(i.value)notes[i.dataset.note]=i.value});
   const focused=document.activeElement?.dataset?.note;
-  $("#sections").innerHTML=html;
+  if(secretOn()){ $("#sections").innerHTML=mainHtml; $("#secretBox").innerHTML=html }
+  else { $("#sections").innerHTML=html; $("#secretBox").innerHTML="" }
   open.forEach(id=>{const d=document.querySelector(`.item[data-id="${id}"] details`); if(d) d.open=true});
   Object.entries(notes).forEach(([k,v])=>{const i=document.querySelector(`[data-note="${k}"]`); if(i) i.value=v});
   if(focused){const i=document.querySelector(`[data-note="${focused}"]`); if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}}

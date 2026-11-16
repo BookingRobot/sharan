@@ -85,6 +85,35 @@ details ul{margin:6px 0 0;padding-left:18px}
 .seat .check{opacity:0;transition:opacity .2s}
 .seat.picked .check{opacity:1}
 .sheet .cancel{margin-top:8px}
+
+/* v3 */
+.tech{font-size:.72rem;color:var(--muted);font-family:ui-monospace,Menlo,Consolas,monospace;text-decoration:none;display:inline-block}
+.me{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin:14px 0 0}
+.me .txt{flex:1}
+.me b{font-size:1.1rem}
+.av{flex:none;vertical-align:middle}
+.item .row{flex-wrap:nowrap;align-items:center}
+.item .main{display:flex;gap:14px;align-items:center;flex:1;min-width:0}
+.ico{flex:none;width:72px;height:72px;border-radius:14px;background:#f5f0e4;border:1px solid var(--line);padding:4px}
+.tag{padding:2px 4px 2px 3px}
+.tag .av{margin-right:2px}
+details li{list-style:none;margin:3px 0}
+details ul{padding-left:4px}
+.note{display:flex;gap:6px;align-items:flex-start}
+.comment{display:flex;gap:10px;align-items:flex-start}
+.sheet{transition:background .25s}
+.sheet.r1{background:#ffe3e3;color:#3b0d0d}
+.sheet.r2{background:#ffa8a8;color:#3b0d0d}
+.sheet.r3{background:#f03e3e;color:#fff}
+.sheet.r1 .what,.sheet.r2 .what{color:#3b0d0d}.sheet.r3 .what{color:#fff}
+#confirmView .big{font-size:clamp(1.15rem,4.4vw,1.5rem);font-weight:700;line-height:1.35;margin:10px 0 16px}
+#confirmView .btns{display:flex;flex-direction:column;gap:8px}
+#confirmView .yes{font-size:1.15rem;padding:14px;background:#1f2328;color:#fff}
+#confirmView .no{background:rgba(255,255,255,.75);color:#1f2328}
+.sheet.r3 #confirmView{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.dots{letter-spacing:6px;font-size:1.2rem}
+@media (max-width:560px){.item .row{flex-wrap:wrap}.item .row>button{width:100%}.ico{width:60px;height:60px}}
 </style>
 </head>
 <body>
@@ -94,13 +123,13 @@ details ul{margin:6px 0 0;padding-left:18px}
   <div class="stats"><span>3 000 km</span><span>4 dienos</span><span>7 vyrai</span><span>500 € vertės Šaranas</span></div>
   <p class="lead">Tikslas: ne remontuoti automobilį, o sugebėti išspręsti smulkius gedimus ir pasiekti artimiausią servisą.</p>
   <div class="how">
-    <b>Kaip naudotis:</b> prie daikto spausk <b>„Pasirūpinsiu aš“</b> ir Šarane susirask save. Gali rūpintis ir keli.
-    Paspaudei netyčia ar persigalvojai? Spausk <b>✕</b> prie savo vardo: įrašas liks istorijoje, bet nebesiskaičiuos.
-    Po kiekvienu daiktu gali parašyti ir <b>pastabą</b> (pvz. „turiu garaže“). Niekas netrinama, viskas matosi su laiku.
-    Susitariam per 12 valandų!
+    <b>Kaip naudotis:</b> prie daikto spausk <b>„Pasirūpinsiu aš“</b>. Pirmą kartą Šarane susirasi save (tik vieną kartą, rinkis atsakingai!), toliau viskas rašoma tavo vardu.
+    Paspaudei netyčia ar persigalvojai? Spausk <b>✕</b> prie vardo: įrašas liks istorijoje, bet nebesiskaičiuos.
+    Po kiekvienu daiktu gali palikti ir <b>pastabą</b>. Niekas netrinama, o prie kiekvieno įrašo viešai išsaugomas laikas, IP adresas ir naršyklė. Susitariam per 12 valandų!
   </div>
   <div class="progress"><i id="bar"></i></div>
   <div class="progress-label" id="barLabel">Kraunama…</div>
+  <div class="me" id="meBar"></div>
 </header>
 
 <main id="sections"></main>
@@ -115,7 +144,7 @@ details ul{margin:6px 0 0;padding-left:18px}
 <h2>💰 Biudžetas</h2>
 <div class="box"><ul>
   <li>Jei nieko neturite, visas minimalus rinkinys kainuotų maždaug <b>60–100 €</b>, neskaičiuojant privalomos saugos įrangos.</li>
-  <li>Siūlymas: dar prieš kelionę už maždaug <b>20–40 €</b> nuvažiuoti į servisą ir paprašyti patikrinti aušinimo sistemą, diržus, padangas, stabdžius bei skysčių nuotėkius.</li>
+  <li>Serviso patikra ir važiavimo benzinu bei LPG patikrinimas <b>jau padaryti</b> ✅</li>
   <li>3 000 km per keturias dienas su 500 € kainavusiu Šaranu: techninės pagalbos draudimas Europoje gali būti vertingesnis už visą įrankių dėžę. Patikrinkit, ar jis galioja tokio amžiaus autui ir ar apima transportavimą iš užsienio.</li>
 </ul></div>
 
@@ -141,169 +170,326 @@ details ul{margin:6px 0 0;padding-left:18px}
 </div>
 
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
-  <div class="sheet">
-    <h3 id="mTitle">Kas tu? 🤔</h3>
-    <p class="what" id="mWhat"></p>
-    <svg id="van" viewBox="0 0 380 640" role="group" aria-label="Šaranas iš viršaus"></svg>
-    <button class="ghost cancel" id="mCancel">Atšaukti</button>
+  <div class="sheet" id="sheet">
+    <div id="pickView">
+      <h3 id="mTitle">Kas tu? 🤔</h3>
+      <p class="what">Susirask save Šarane ir spausk. Rinksiesi tik <b>vieną kartą</b>!</p>
+      <svg id="van" viewBox="0 0 380 640" role="group" aria-label="Šaranas iš viršaus"></svg>
+      <button class="ghost cancel" id="mCancel">Atšaukti</button>
+    </div>
+    <div id="confirmView" hidden></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
 const PEOPLE = ["Simonas","Deksnys","Thūlė","Modė","Kvedaravičius","Vacys","Abramovič"];
-const TOPIC = "sharan-rinkinys-v2-h4t8w1";
+const TOPIC = "sharan-rinkinys-v3-q9d2x6";
 const NTFY = "https://ntfy.sh/" + TOPIC;
 const ARCHIVE = "https://raw.githubusercontent.com/BookingRobot/sharan/main/data/entries.json";
+const ME_KEY = "sharan-kas-as-v3";
 
-// Faces: skin, hair colour, hair style, extras
-const FACES = {
-  "Simonas":       {skin:"#f2c9a0", hair:"#6b4423", style:"short",  beard:false, glasses:false},
-  "Deksnys":       {skin:"#eebb94", hair:"#2b2b2b", style:"buzz",   beard:true,  glasses:false},
-  "Thūlė":         {skin:"#f6d2b0", hair:"#e0b25a", style:"long",   beard:false, glasses:false},
-  "Modė":          {skin:"#e9b48a", hair:"#8a3b12", style:"curly",  beard:false, glasses:true},
-  "Kvedaravičius": {skin:"#6b3e26", hair:"#1a1a1a", style:"afro",   beard:true,  glasses:false},
-  "Vacys":         {skin:"#f0c49c", hair:"#b9b9b9", style:"bald",   beard:true,  glasses:true},
-  "Abramovič":     {skin:"#f3cfa9", hair:"#3b2a1a", style:"side",   beard:false, glasses:false},
+/* ---------- personažai (galvos spindulys 26, centras 0,0) ---------- */
+const INK="#1f2328";
+function head(skin){return `<ellipse cx="-26" cy="2" rx="5" ry="7" fill="${skin}"/><ellipse cx="26" cy="2" rx="5" ry="7" fill="${skin}"/><circle r="26" fill="${skin}"/>`}
+const eyes=`<circle cx="-9" cy="-3" r="2.7" fill="${INK}"/><circle cx="9" cy="-3" r="2.7" fill="${INK}"/>`;
+const cheeks=`<circle cx="-15" cy="7" r="4" fill="#ff8787" opacity=".35"/><circle cx="15" cy="7" r="4" fill="#ff8787" opacity=".35"/>`;
+const smile=(c="#7a2e1a")=>`<path d="M-10 9 Q0 20 10 9" fill="none" stroke="${c}" stroke-width="2.6" stroke-linecap="round"/>`;
+const CHAR = {
+ // meras: grandinė su medaliu
+ "Simonas": ()=>`
+   <path d="M-21 15 Q0 50 21 15" fill="none" stroke="#f2b705" stroke-width="5" stroke-dasharray="5 2.5"/>
+   ${head("#f2c9a0")}
+   <path d="M-25 -6 Q-25 -30 0 -29 Q25 -30 25 -6 Q12 -19 -6 -17 Q-18 -16 -25 -6 Z" fill="#6b4423"/>
+   ${eyes}${cheeks}
+   <path d="M-11 8 Q0 21 11 8 Z" fill="#fff" stroke="#7a2e1a" stroke-width="2" stroke-linejoin="round"/>
+   <circle cy="36" r="8.5" fill="#f2b705" stroke="#b8860b" stroke-width="2"/>
+   <path d="M0 30.5 L1.8 34.5 L6 34.8 L2.8 37.5 L3.8 41.6 L0 39.4 L-3.8 41.6 L-2.8 37.5 L-6 34.8 L-1.8 34.5 Z" fill="#fff8dc"/>`,
+ // visiškas inžinierius: šalmas, akiniai, pieštukas už ausies
+ "Deksnys": ()=>`
+   ${head("#eebb94")}
+   <rect x="24" y="-20" width="4" height="22" rx="1" fill="#f2b705" transform="rotate(14 26 -9)"/><path d="M24.6 2.6 l4 1 l-3 4 Z" fill="${INK}" transform="rotate(14 26 -9)"/>
+   <path d="M-27 -10 Q-27 -36 0 -36 Q27 -36 27 -10 Z" fill="#ffd43b" stroke="#b8860b" stroke-width="2"/>
+   <rect x="-32" y="-13" width="64" height="6" rx="3" fill="#fab005" stroke="#b8860b" stroke-width="1.5"/>
+   <rect x="-3" y="-36" width="6" height="24" fill="#fab005"/>
+   <g fill="#fff" fill-opacity=".55" stroke="${INK}" stroke-width="2.2"><rect x="-18" y="-4" width="15" height="11" rx="2"/><rect x="3" y="-4" width="15" height="11" rx="2"/></g>
+   <path d="M-3 0 L3 0 M-18 0 L-25 -2 M18 0 L25 -2" stroke="${INK}" stroke-width="2.2"/>
+   <circle cx="-10.5" cy="1.5" r="2.2" fill="${INK}"/><circle cx="10.5" cy="1.5" r="2.2" fill="${INK}"/>
+   <path d="M-7 14 L7 14" stroke="#7a2e1a" stroke-width="2.6" stroke-linecap="round"/>`,
+ // senelis: žili plaukai šonuose, ūsai, raukšlės
+ "Thūlė": ()=>`
+   <circle cx="-24" cy="-8" r="10" fill="#e9ecef"/><circle cx="24" cy="-8" r="10" fill="#e9ecef"/>
+   ${head("#f1cfae")}
+   <path d="M-12 -17 Q0 -20 12 -17 M-9 -22 Q0 -24 9 -22" fill="none" stroke="#c9a37f" stroke-width="1.6" stroke-linecap="round"/>
+   <path d="M-15 -8 l10 -1 M5 -9 l10 1" stroke="#e9ecef" stroke-width="3.5" stroke-linecap="round"/>
+   ${eyes}${cheeks}
+   <path d="M-15 -1 q-3 2 -4 5 M15 -1 q3 2 4 5" fill="none" stroke="#c9a37f" stroke-width="1.4" stroke-linecap="round"/>
+   <ellipse cy="5" rx="3.5" ry="3" fill="#e3b08c"/>
+   <path d="M0 8 Q-8 5 -17 12 Q-8 16 0 11 Q8 16 17 12 Q8 5 0 8 Z" fill="#f1f3f5" stroke="#ced4da" stroke-width="1"/>
+   <path d="M-6 16 Q0 20 6 16" fill="none" stroke="#7a2e1a" stroke-width="2.2" stroke-linecap="round"/>`,
+ // pochuistas: susivėlęs, primerktos akys, šypsenėlė į šoną, šiaudelis
+ "Modė": ()=>`
+   ${head("#eab98f")}
+   <path d="M-27 -4 Q-30 -22 -20 -26 Q-22 -34 -11 -30 Q-6 -38 2 -30 Q10 -37 15 -28 Q25 -31 23 -21 Q31 -14 26 -3 Q20 -14 12 -13 Q6 -19 -1 -13 Q-8 -19 -14 -12 Q-22 -12 -27 -4 Z" fill="#a0733f"/>
+   <path d="M-15 -3 h11 M4 -3 h11" stroke="${INK}" stroke-width="2.6" stroke-linecap="round"/>
+   <path d="M-13 -2.5 a4 3.4 0 0 0 7 0 Z M6 -2.5 a4 3.4 0 0 0 7 0 Z" fill="${INK}"/>
+   <path d="M-16 -9 l11 1 M5 -8 l11 -1" stroke="#7a5630" stroke-width="2" stroke-linecap="round"/>
+   <path d="M-7 12 Q3 15 11 8" fill="none" stroke="#7a2e1a" stroke-width="2.6" stroke-linecap="round"/>
+   <path d="M9 10 L30 20" stroke="#d9a441" stroke-width="2.2" stroke-linecap="round"/>`,
+ // su kepurėle
+ "Kvedaravičius": ()=>`
+   ${head("#f0c49c")}
+   <path d="M-25 -5 Q-26 -29 0 -29 Q26 -29 25 -5 Q14 -17 0 -16 Q-14 -17 -25 -5 Z" fill="#3b2a1a"/>
+   <path d="M-17 -22 Q0 -42 17 -22 Q0 -27 -17 -22 Z" fill="#1c5fb8" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/>
+   <path d="M-12 -25.5 Q0 -30 12 -25.5" fill="none" stroke="#fff" stroke-width="1.3" stroke-dasharray="2 2"/>
+   ${eyes}${cheeks}${smile()}`,
+ // plikas bičas
+ "Vacys": ()=>`
+   ${head("#f0c49c")}
+   <path d="M-17 -16 Q-12 -23 -4 -24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".6"/>
+   <path d="M-16 -9 l11 1.5 M5 -7.5 l11 -1.5" stroke="#5c4632" stroke-width="3" stroke-linecap="round"/>
+   ${eyes}${cheeks}
+   <path d="M-21 8 Q-16 26 0 26 Q16 26 21 8 Q12 19 0 19 Q-12 19 -21 8 Z" fill="#5c4632" opacity=".22"/>
+   ${smile()}`,
+ // juodaodis
+ "Abramovič": ()=>`
+   ${head("#6b3e26")}
+   <path d="M-26 -3 Q-28 -31 0 -31 Q28 -31 26 -3 Q20 -19 0 -19 Q-20 -19 -26 -3 Z" fill="#1a1a1a"/>
+   <circle cx="-9" cy="-3" r="4.6" fill="#fff"/><circle cx="9" cy="-3" r="4.6" fill="#fff"/>${eyes}
+   <path d="M-12 8 Q0 23 12 8 Z" fill="#fff" stroke="#3a1d10" stroke-width="2" stroke-linejoin="round"/>`,
 };
+function face(p,cx,cy,r){ const f=CHAR[p]; return f?`<g transform="translate(${cx} ${cy}) scale(${r/26})">${f()}</g>`:"" }
+function avatar(p,size=28){
+  if(!CHAR[p]) return "";
+  return `<svg class="av" width="${size}" height="${size*1.1}" viewBox="-36 -40 72 88" aria-hidden="true">${CHAR[p]()}</svg>`;
+}
+
+/* ---------- daiktų iliustracijos (64x64) ---------- */
+const BG="#f5f0e4";
+const ICONS = {
+ "galvutes":`<g transform="rotate(-18 32 20)"><rect x="8" y="17" width="34" height="6" rx="3" fill="#495057"/><rect x="5" y="15.5" width="17" height="9" rx="4.5" fill="#e03131"/><circle cx="48" cy="20" r="9" fill="#ced4da" stroke="#495057" stroke-width="2"/><rect x="44" y="16" width="8" height="8" fill="#495057"/></g>
+   <g stroke="#495057" stroke-width="1.5"><rect x="6" y="42" width="12" height="16" rx="2" fill="#dee2e6"/><rect x="22" y="44" width="10" height="14" rx="2" fill="#dee2e6"/><rect x="36" y="46" width="9" height="12" rx="2" fill="#dee2e6"/><rect x="49" y="48" width="8" height="10" rx="2" fill="#dee2e6"/></g>
+   <g fill="#495057"><path d="M12 44.5 l3 1.8 v3.4 l-3 1.8 l-3 -1.8 v-3.4 Z"/><path d="M27 46.5 l2.5 1.5 v3 l-2.5 1.5 l-2.5 -1.5 v-3 Z"/><path d="M40.5 48.5 l2 1.2 v2.6 l-2 1.2 l-2 -1.2 v-2.6 Z"/><circle cx="53" cy="52" r="1.8"/></g>`,
+ "reples":`<path d="M22 60 Q18 42 29 30" fill="none" stroke="#e03131" stroke-width="7" stroke-linecap="round"/><path d="M42 60 Q46 42 35 30" fill="none" stroke="#e03131" stroke-width="7" stroke-linecap="round"/>
+   <path d="M26 31 L26 9 Q26 5 31 5 L31 30 Z" fill="#ced4da" stroke="#495057" stroke-width="1.5"/><path d="M38 31 L38 9 Q38 5 33 5 L33 30 Z" fill="#ced4da" stroke="#495057" stroke-width="1.5"/>
+   <path d="M31 8 h-3 M31 12 h-3 M31 16 h-3 M33 8 h3 M33 12 h3 M33 16 h3" stroke="#495057" stroke-width="1"/><circle cx="32" cy="30" r="4.5" fill="#868e96" stroke="#495057" stroke-width="1.5"/>`,
+ "uzverzejai":`<circle cx="26" cy="38" r="16" fill="none" stroke="#212529" stroke-width="4.5"/><path d="M39 27 L59 6" stroke="#212529" stroke-width="4.5" stroke-linecap="round"/>
+   <path d="M47 15 l3 3 M50 12 l3 3 M53 9 l3 3" stroke="#868e96" stroke-width="1.2"/><rect x="33" y="20" width="12" height="12" rx="2" fill="#343a40" stroke="#000" stroke-width="1" transform="rotate(-45 39 26)"/>
+   <rect x="4" y="5" width="8" height="7" rx="1.5" fill="#f8f9fa" stroke="#868e96" stroke-width="1.2"/><path d="M12 8.5 H34" stroke="#f8f9fa" stroke-width="3.6" stroke-linecap="round"/><path d="M12 8.5 H34" stroke="#868e96" stroke-width="1" stroke-dasharray="1.5 2"/>`,
+ "skocas":`<circle cx="28" cy="32" r="23" fill="#adb5bd" stroke="#495057" stroke-width="2"/><path d="M10 22 A21 21 0 0 1 40 13" fill="none" stroke="#e9ecef" stroke-width="4" stroke-linecap="round" opacity=".8"/>
+   <circle cx="28" cy="32" r="12" fill="#c08b5c" stroke="#7a4a21" stroke-width="1.5"/><circle cx="28" cy="32" r="8.5" fill="${BG}" stroke="#7a4a21" stroke-width="1.2"/>
+   <path d="M44 48 L62 48 L59 52 L62 56 L44 56 Z" fill="#ced4da" stroke="#495057" stroke-width="1.5"/>`,
+ "izoliacine":`<circle cx="24" cy="36" r="18" fill="#212529"/><circle cx="24" cy="36" r="11" fill="#f1f3f5"/><circle cx="24" cy="36" r="8" fill="${BG}" stroke="#adb5bd" stroke-width="1"/><path d="M38 48 H54 V55 H36 Z" fill="#212529"/>
+   <circle cx="48" cy="18" r="12" fill="#1c7ed6"/><circle cx="48" cy="18" r="7" fill="#f1f3f5"/><circle cx="48" cy="18" r="5" fill="${BG}" stroke="#adb5bd" stroke-width="1"/>
+   <path d="M12 4 L5 16 H11 L8 26 L18 12 H12 L15 4 Z" fill="#fcc419" stroke="#b8860b" stroke-width="1"/>`,
+ "saugikliai":[["#e03131","10",3],["#1c7ed6","15",23],["#f2b705","20",43]].map(([c,t,x])=>`<rect x="${x+3}" y="34" width="3.5" height="20" fill="#adb5bd" stroke="#495057" stroke-width=".8"/><rect x="${x+11.5}" y="34" width="3.5" height="20" fill="#adb5bd" stroke="#495057" stroke-width=".8"/><rect x="${x}" y="10" width="18" height="26" rx="3" fill="${c}" fill-opacity=".9" stroke="${INK}" stroke-width="1.5"/><text x="${x+9}" y="27" text-anchor="middle" font-size="10" font-weight="800" fill="#fff">${t}</text>`).join(""),
+ "zibintuvelis":`<path d="M49 20 L64 8 V56 L49 44 Z" fill="#ffe066" opacity=".75"/><rect x="2" y="26" width="32" height="12" rx="3" fill="#343a40"/><path d="M8 26 v12 M12 26 v12 M16 26 v12" stroke="#868e96" stroke-width="1"/>
+   <path d="M34 25 L46 19 V45 L34 39 Z" fill="#495057"/><rect x="46" y="18" width="4" height="28" rx="1.5" fill="#fcc419" stroke="#495057" stroke-width="1"/><rect x="22" y="23.5" width="7" height="3.5" rx="1.5" fill="#e03131"/>`,
+ "pirstines":`<g fill="#f08c00" stroke="#a85d00" stroke-width="1.5"><rect x="18" y="12" width="7" height="22" rx="3.5"/><rect x="25.5" y="7" width="7" height="27" rx="3.5"/><rect x="33" y="8" width="7" height="26" rx="3.5"/><rect x="40.5" y="13" width="6.5" height="21" rx="3.2"/><rect x="5" y="30" width="18" height="8" rx="4" transform="rotate(35 14 34)"/><rect x="18" y="26" width="29" height="26" rx="6"/></g>
+   <rect x="19" y="27" width="27" height="20" rx="5" fill="#f08c00"/><path d="M22 40 h21 M22 35 h21" stroke="#a85d00" stroke-width="1" opacity=".5"/><rect x="18" y="49" width="29" height="10" rx="2" fill="#495057"/>`,
+ "kompresorius":`<path d="M16 26 Q26 8 36 26" fill="none" stroke="#343a40" stroke-width="4"/><rect x="6" y="24" width="40" height="30" rx="6" fill="#e03131" stroke="#a61e1e" stroke-width="2"/><rect x="10" y="54" width="8" height="4" fill="#343a40"/><rect x="34" y="54" width="8" height="4" fill="#343a40"/>
+   <circle cx="20" cy="38" r="9" fill="#fff" stroke="#343a40" stroke-width="2"/><path d="M20 38 L25.5 32.5" stroke="#e03131" stroke-width="2" stroke-linecap="round"/><path d="M14 38 h2 M24 38 h2 M20 32 v2" stroke="#343a40" stroke-width="1"/><text x="37" y="43" text-anchor="middle" font-size="8" font-weight="800" fill="#fff">12V</text>
+   <path d="M46 34 Q62 32 59 46 Q57 56 51 55" fill="none" stroke="#212529" stroke-width="3" stroke-linecap="round"/><rect x="46" y="52" width="6" height="6" rx="1" fill="#f2b705" stroke="#b8860b" stroke-width="1"/>`,
+ "padangu-rinkinys":`<rect x="4" y="8" width="30" height="11" rx="5.5" fill="#e03131" stroke="#a61e1e" stroke-width="1.5"/><rect x="16.5" y="19" width="5" height="26" fill="#ced4da" stroke="#495057" stroke-width="1.2"/><path d="M16.5 45 L19 58 L21.5 45 Z" fill="#868e96" stroke="#495057" stroke-width="1"/><ellipse cx="19" cy="50" rx="1" ry="3" fill="${BG}"/>
+   <g stroke="#7a4a21" stroke-width="5.5" stroke-linecap="round"><path d="M42 10 V54"/><path d="M50 10 V54"/><path d="M58 10 V54"/></g><g stroke="#a8743f" stroke-width="1" stroke-dasharray="2 3"><path d="M42 10 V54"/><path d="M50 10 V54"/><path d="M58 10 V54"/></g>`,
+ "uzvedimo-laidai":`<path d="M11 18 Q2 56 28 50 Q50 44 47 22" fill="none" stroke="#e03131" stroke-width="4" stroke-linecap="round"/><path d="M21 16 Q14 62 40 57 Q60 52 56 28" fill="none" stroke="#212529" stroke-width="4" stroke-linecap="round"/>
+   <g stroke="#7a1010" stroke-width="1" fill="#e03131"><path d="M5 3 L16 3 L13 19 L9 19 Z"/><path d="M41 8 L52 8 L49 24 L45 24 Z"/></g><g fill="#212529"><path d="M16 2 L27 2 L24 18 L20 18 Z"/><path d="M51 14 L62 14 L59 30 L55 30 Z"/></g>
+   <g fill="#ced4da"><path d="M7 3 l2 -3 l2 3 Z M12 3 l2 -3 l1 3 Z"/><path d="M43 8 l2 -3 l2 3 Z M48 8 l2 -3 l1 3 Z"/><path d="M18 2 l2 -2 l2 2 Z"/><path d="M53 14 l2 -3 l2 3 Z M58 14 l2 -3 l1 3 Z"/></g>`,
+ "liemenes":`<path d="M16 6 L25 6 Q32 20 39 6 L48 6 L55 20 L49 27 V58 H15 V27 L9 20 Z" fill="#d9f20a" stroke="#8a9a00" stroke-width="2" stroke-linejoin="round"/><rect x="15" y="34" width="34" height="6" fill="#dee2e6" stroke="#868e96" stroke-width="1"/><rect x="15" y="45" width="34" height="6" fill="#dee2e6" stroke="#868e96" stroke-width="1"/>
+   <path d="M32 17 V58" stroke="#8a9a00" stroke-width="1.5"/><circle cx="52" cy="50" r="10" fill="#e03131" stroke="#fff" stroke-width="2"/><text x="52" y="54" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">×7</text>`,
+ "vaistai":`<g transform="rotate(-30 20 20)"><rect x="4" y="13" width="32" height="14" rx="7" fill="#fff" stroke="#495057" stroke-width="1.5"/><path d="M20 13 H29 A7 7 0 0 1 29 27 H20 Z" fill="#e03131" stroke="#495057" stroke-width="1.5"/></g>
+   <circle cx="46" cy="18" r="10" fill="#fff" stroke="#495057" stroke-width="1.5"/><path d="M39 18 H53" stroke="#adb5bd" stroke-width="1.5"/><circle cx="14" cy="38" r="6" fill="#ffd8a8" stroke="#a85d00" stroke-width="1.2"/>
+   <g transform="rotate(-12 34 50)"><rect x="8" y="42" width="52" height="16" rx="8" fill="#f1c9a0" stroke="#b9895c" stroke-width="1.5"/><rect x="25" y="43.5" width="18" height="13" rx="2" fill="#fff4e6" stroke="#b9895c" stroke-width="1"/><g fill="#b9895c"><circle cx="14" cy="47" r="1"/><circle cx="19" cy="53" r="1"/><circle cx="14" cy="53" r="1"/><circle cx="19" cy="47" r="1"/><circle cx="49" cy="47" r="1"/><circle cx="54" cy="53" r="1"/><circle cx="49" cy="53" r="1"/><circle cx="54" cy="47" r="1"/></g></g>`,
+ "laikiklis":`<path d="M2 4 H62" stroke="#74c0fc" stroke-width="4" stroke-linecap="round"/><path d="M18 6 Q32 20 46 6 Z" fill="#495057" stroke="#212529" stroke-width="1.5"/><path d="M32 13 Q32 26 40 30" fill="none" stroke="#343a40" stroke-width="5" stroke-linecap="round"/><circle cx="40" cy="30" r="4" fill="#868e96" stroke="#343a40" stroke-width="1.5"/>
+   <g transform="rotate(12 34 42)"><rect x="12" y="34" width="6" height="16" rx="2" fill="#343a40"/><rect x="50" y="34" width="6" height="16" rx="2" fill="#343a40"/><rect x="16" y="26" width="36" height="32" rx="5" fill="#212529"/><rect x="19" y="29" width="30" height="26" rx="2" fill="#d3f9d8"/><path d="M22 50 Q30 34 36 44 Q40 50 46 34" fill="none" stroke="#1c7ed6" stroke-width="2.5" stroke-linecap="round"/><path d="M46 31 q-4 0 -4 4 q0 3 4 7 q4 -4 4 -7 q0 -4 -4 -4 Z" fill="#e03131"/></g>`,
+ "usb":`<path d="M17 30 Q17 58 34 54 Q50 50 47 34" fill="none" stroke="#343a40" stroke-width="4" stroke-linecap="round"/><rect x="9" y="4" width="16" height="13" fill="#dee2e6" stroke="#495057" stroke-width="1.5"/><rect x="12" y="8" width="4" height="4" fill="#495057"/><rect x="18" y="8" width="4" height="4" fill="#495057"/><rect x="7" y="17" width="20" height="14" rx="3" fill="#343a40"/>
+   <rect x="42" y="10" width="10" height="9" rx="4" fill="#dee2e6" stroke="#495057" stroke-width="1.5"/><rect x="40" y="19" width="14" height="15" rx="3" fill="#343a40"/><circle cx="52" cy="50" r="10" fill="#e03131" stroke="#fff" stroke-width="2"/><text x="52" y="54" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">×2</text>`,
+ "prikurke":`<g transform="rotate(-35 32 32)"><rect x="50" y="27" width="10" height="10" rx="4" fill="#ced4da" stroke="#495057" stroke-width="1.5"/><path d="M36 18 q6 -6 10 0 M36 46 q6 6 10 0" fill="none" stroke="#adb5bd" stroke-width="3" stroke-linecap="round"/><rect x="22" y="20" width="30" height="24" rx="5" fill="#343a40" stroke="#212529" stroke-width="1.5"/><rect x="4" y="14" width="22" height="36" rx="6" fill="#212529"/><rect x="4" y="14" width="6" height="36" rx="3" fill="#1c7ed6"/><rect x="12" y="19" width="5" height="11" rx="1" fill="#f1f3f5"/><rect x="12" y="34" width="5" height="11" rx="1" fill="#f1f3f5"/></g>
+   <text x="50" y="58" text-anchor="middle" font-size="10" font-weight="800" fill="#343a40">12V</text>`,
+ "alyva":`<rect x="18" y="5" width="13" height="9" rx="2" fill="#343a40"/><path d="M14 14 H38 L50 26 V56 Q50 60 46 60 H18 Q14 60 14 56 Z" fill="#f59f00" stroke="#a85d00" stroke-width="2" stroke-linejoin="round"/><rect x="38" y="27" width="7" height="14" rx="3.5" fill="${BG}" stroke="#a85d00" stroke-width="1.5"/>
+   <rect x="18" y="30" width="16" height="22" rx="2" fill="#fff8e1"/><path d="M26 33 Q19 43 26 47 Q33 43 26 33 Z" fill="#343a40"/><text x="42" y="54" text-anchor="middle" font-size="8" font-weight="800" fill="#fff">1L</text>`,
+ "ausinimo":`<rect x="20" y="5" width="13" height="10" rx="2" fill="#343a40"/><path d="M14 20 Q14 15 19 15 H40 L50 24 V56 Q50 60 46 60 H18 Q14 60 14 56 Z" fill="#12b886" stroke="#087f5b" stroke-width="2" stroke-linejoin="round"/><rect x="39" y="26" width="6" height="12" rx="3" fill="${BG}" stroke="#087f5b" stroke-width="1.5"/>
+   <rect x="18" y="30" width="18" height="22" rx="2" fill="#fff"/><g stroke="#1c7ed6" stroke-width="2" stroke-linecap="round"><path d="M27 33 V49 M20 37 L34 45 M34 37 L20 45"/></g><text x="43" y="54" text-anchor="middle" font-size="8" font-weight="800" fill="#fff">1L</text>`,
+ "vanduo":`<rect x="26" y="3" width="12" height="7" rx="2" fill="#1c7ed6"/><path d="M27 10 H37 V16 Q47 20 47 30 V55 Q47 60 42 60 H22 Q17 60 17 55 V30 Q17 20 27 16 Z" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="2"/>
+   <path d="M18 30 Q25 26 32 30 Q39 34 46 30 V55 Q46 59 42 59 H22 Q18 59 18 55 Z" fill="#74c0fc"/><path d="M17 38 H47 M17 46 H47" stroke="#1c7ed6" stroke-width="1" opacity=".4"/><text x="32" y="52" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">2L</text>`,
+ "trikampis":`<path d="M14 58 L8 62 M50 58 L56 62" stroke="#495057" stroke-width="3" stroke-linecap="round"/><path d="M32 8 L58 54 H6 Z" fill="#fff" stroke="#e03131" stroke-width="8" stroke-linejoin="round"/><path d="M32 22 L46 47 H18 Z" fill="none" stroke="#ffa8a8" stroke-width="1.5" stroke-linejoin="round"/>`,
+ "vaistinele":`<path d="M23 18 Q23 8 32 8 Q41 8 41 18" fill="none" stroke="#1d6b2d" stroke-width="4"/><rect x="6" y="18" width="52" height="38" rx="7" fill="#2f9e44" stroke="#1d6b2d" stroke-width="2"/><path d="M6 30 H58" stroke="#1d6b2d" stroke-width="1" opacity=".5"/><rect x="27" y="24" width="10" height="26" rx="1.5" fill="#fff"/><rect x="19" y="32" width="26" height="10" rx="1.5" fill="#fff"/>`,
+ "gesintuvas":`<path d="M24 16 Q8 18 11 36" fill="none" stroke="#212529" stroke-width="3.5" stroke-linecap="round"/><path d="M8 34 L14 34 L15 42 L7 42 Z" fill="#212529"/><rect x="28" y="12" width="8" height="10" fill="#adb5bd" stroke="#495057" stroke-width="1"/><path d="M24 10 H42 V15 H24 Z" fill="#212529"/><path d="M30 10 L47 4" stroke="#212529" stroke-width="3.5" stroke-linecap="round"/>
+   <rect x="20" y="21" width="24" height="40" rx="9" fill="#e03131" stroke="#a61e1e" stroke-width="2"/><rect x="24" y="33" width="16" height="13" rx="1.5" fill="#fff"/><path d="M32 35 Q28 40 32 44 Q36 40 32 35 Z" fill="#f08c00"/><circle cx="40" cy="27" r="3" fill="#fff" stroke="#495057" stroke-width="1"/>`,
+ "vilkimo-kilpa":`<circle cx="20" cy="20" r="12" fill="none" stroke="#868e96" stroke-width="8"/><circle cx="20" cy="20" r="12" fill="none" stroke="#dee2e6" stroke-width="2" stroke-dasharray="14 60"/><path d="M29 29 L56 56" stroke="#868e96" stroke-width="8" stroke-linecap="round"/>
+   <g stroke="#343a40" stroke-width="1.6"><path d="M40 46 l6 -6 M44 50 l6 -6 M48 54 l6 -6 M52 58 l6 -6"/></g><path d="M33 39 l6 -6" stroke="#495057" stroke-width="3"/>`,
+ "pagalbos-nr":`<rect x="16" y="3" width="32" height="58" rx="7" fill="#212529"/><rect x="19" y="9" width="26" height="44" rx="2" fill="#e7f5ff"/><circle cx="32" cy="57" r="2" fill="#868e96"/><rect x="22" y="13" width="20" height="13" rx="3" fill="#e03131"/><text x="32" y="23" text-anchor="middle" font-size="9" font-weight="800" fill="#fff">SOS</text>
+   <circle cx="32" cy="40" r="9" fill="#2f9e44"/><path d="M27 37 q0 -2 2 -2 l2 3 l-1.5 1.5 q1.5 3 4 4.5 l1.5 -1.5 l3 2 q0 2 -2 2 q-8 -1 -9 -9.5 Z" fill="#fff"/>`,
+ "servisas":`<rect x="29" y="48" width="6" height="12" fill="#868e96"/><rect x="18" y="58" width="28" height="4" rx="1" fill="#495057"/><rect x="6" y="45" width="52" height="4" rx="1" fill="#f2b705" stroke="#b8860b" stroke-width="1"/>
+   <path d="M5 34 L12 32 L19 21 H41 L50 32 L59 34 V41 H5 Z" fill="#5c7c99" stroke="#3f5b75" stroke-width="2" stroke-linejoin="round"/><path d="M21 24 H30 V32 H15 Z M33 24 H40 L46 32 H33 Z" fill="#a5d8ff"/><circle cx="17" cy="41" r="5.5" fill="#212529"/><circle cx="47" cy="41" r="5.5" fill="#212529"/><circle cx="17" cy="41" r="2" fill="#adb5bd"/><circle cx="47" cy="41" r="2" fill="#adb5bd"/>
+   <path d="M44 16 L54 6" stroke="#495057" stroke-width="4" stroke-linecap="round"/><path d="M52 2 a6 6 0 1 0 8 8 l-4 0 l-4 -4 Z" fill="#495057"/>`,
+ "draudimas":`<path d="M32 4 L55 12 V30 Q55 50 32 61 Q9 50 9 30 V12 Z" fill="#1c7ed6" stroke="#114e85" stroke-width="2.5" stroke-linejoin="round"/><path d="M32 9 L50 15.5 V30 Q50 46 32 55.5 Z" fill="#fff" opacity=".15"/><path d="M20 31 L29 41 L45 21" fill="none" stroke="#fff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>`,
+ "lpg":`<rect x="6" y="56" width="36" height="5" rx="1" fill="#343a40"/><rect x="10" y="8" width="28" height="48" rx="4" fill="#2f9e44" stroke="#1d6b2d" stroke-width="2"/><rect x="14" y="13" width="20" height="13" rx="1.5" fill="#e7f5ff" stroke="#1d6b2d" stroke-width="1"/><path d="M17 20 h8 M17 23 h13" stroke="#495057" stroke-width="1.5"/>
+   <text x="24" y="43" text-anchor="middle" font-size="10" font-weight="800" fill="#fff">LPG</text><path d="M38 22 Q54 20 54 36 V44" fill="none" stroke="#212529" stroke-width="3.5" stroke-linecap="round"/><path d="M50 42 H58 V54 Q58 57 55 57 H53 Q50 57 50 54 Z" fill="#343a40"/><path d="M54 57 v4" stroke="#343a40" stroke-width="2.5"/>`,
+};
+function icon(id){ return `<svg class="ico" viewBox="0 0 64 64" aria-hidden="true">${ICONS[id]||""}</svg>` }
 
 const SECTIONS = [
  {t:"🔧 Minimalus remonto rinkinys", items:[
-  ["galvutes","🔧","Mažas galvučių ir atsuktuvų rinkinys","Atsukti, priveržti, pritvirtinti"],
-  ["reples","🔩","Universalios replės","Suimti, patraukti, užspausti"],
-  ["uzverzejai","🔗","Plastikiniai užveržėjai (10–15 vnt.)","Pritvirtinti atsilaisvinusias detales"],
-  ["armavimo","🩶","Armavimo lipni juosta","Laikiniems kėbulo ir plastiko remontams"],
-  ["izoliacine","⚡","Izoliacinė juosta","Laidams izoliuoti"],
-  ["saugikliai","🔌","Saugiklių rinkinys","Perdegusiems saugikliams pakeisti"],
-  ["zibintuvelis","🔦","Žibintuvėlis","Gedimams tamsoje"],
-  ["pirstines","🧤","Darbinės pirštinės","Kad rankų nenusiteptume"]]},
+  ["galvutes","Mažas galvučių ir atsuktuvų rinkinys","Atsukti, priveržti, pritvirtinti"],
+  ["reples","Universalios replės","Suimti, patraukti, užspausti"],
+  ["uzverzejai","Plastikiniai užveržėjai (10–15 vnt.)","Pritvirtinti atsilaisvinusias detales"],
+  ["skocas","Skočas (pilka lipni juosta)","Viską turim išsiversti su skočiu"],
+  ["saugikliai","Saugiklių rinkinys","Perdegusiems saugikliams pakeisti"],
+  ["zibintuvelis","Žibintuvėlis","Gedimams tamsoje"],
+  ["pirstines","Darbinės pirštinės","Kad rankų nenusiteptume"]]},
  {t:"🛞 Padangos ir užvedimas", items:[
-  ["kompresorius","🛞","12 V kompresorius","Pripūsti padangą"],
-  ["padangu-rinkinys","🩹","Padangos remonto rinkinys su virvutėmis","Smulkiam protektoriaus pradūrimui"],
-  ["uzvedimo-laidai","🔋","Užvedimo laidai","Jei nusėstų akumuliatorius"],
-  ["liemenes","🦺","Atšvaitinės liemenės (7 vnt.)","Saugumui sustojus kelyje"]]},
+  ["kompresorius","12 V kompresorius","Pripūsti padangą"],
+  ["padangu-rinkinys","Padangos remonto rinkinys su virvutėmis","Smulkiam protektoriaus pradūrimui"],
+  ["uzvedimo-laidai","Užvedimo laidai","Jei nusėstų akumuliatorius"],
+  ["liemenes","Atšvaitinės liemenės (7 vnt.)","Saugumui sustojus kelyje"]]},
  {t:"🧴 Skysčiai", items:[
-  ["alyva","🛢️","Variklio alyva","1 l tinkamos specifikacijos"],
-  ["ausinimo","❄️","Aušinimo skystis","1 l tinkamo tipo"],
-  ["vanduo","💧","Vanduo","2 l avariniam papildymui"]]},
+  ["alyva","Variklio alyva","1 l tinkamos specifikacijos"],
+  ["ausinimo","Aušinimo skystis","1 l tinkamo tipo"],
+  ["vanduo","Vanduo","2 l avariniam papildymui"]]},
  {t:"🚨 Privalomi ir labai rekomenduojami", items:[
-  ["trikampis","⚠️","Avarinis trikampis","Privalomas"],
-  ["vaistinele","🩺","Pirmosios pagalbos vaistinėlė","Privaloma"],
-  ["gesintuvas","🧯","Gesintuvas","Privalomas"],
-  ["vilkimo-kilpa","🪝","Vilkimo kilpa","Patikrinti, ar yra automobilyje"],
-  ["pagalbos-nr","📱","Techninės pagalbos Europoje numeris","Išsaugoti telefone ir pasidalinti su visais"]]},
+  ["trikampis","Avarinis trikampis","Privalomas"],
+  ["vaistinele","Pirmosios pagalbos vaistinėlė","Privaloma"],
+  ["vaistai","Vaistai: aspirinas, ibuprofenas ir 3 pleistrai","Nes galvą tikrai kažkam skaudės"],
+  ["gesintuvas","Gesintuvas","Privalomas"],
+  ["vilkimo-kilpa","Vilkimo kilpa","Patikrinti, ar yra automobilyje"],
+  ["pagalbos-nr","Techninės pagalbos Europoje numeris","Išsaugoti telefone ir pasidalinti su visais"]]},
+ {t:"📱 Telefonai ir krovimas", items:[
+  ["laikiklis","Telefono laikiklis prie lango","Navigacijai, kad vairuotojui nereikėtų laikyti rankoje"],
+  ["usb","USB laidai (mažiausiai 2 vnt.)","Pakrovėjus turbūt visi turės savo"],
+  ["prikurke","USB kištukas į 12 V prikurkę","Krauti telefonus važiuojant"]]},
  {t:"📋 Užduotys prieš kelionę", items:[
-  ["servisas","🧰","Serviso patikra (20–40 €)","Aušinimo sistema, diržai, padangos, stabdžiai, nuotėkiai"],
-  ["draudimas","🛡️","Techninės pagalbos draudimas Europoje","Ar galioja tokio amžiaus autui, ar apima transportavimą iš užsienio"],
-  ["lpg","⛽","Patikrinti važiavimą benzinu ir LPG","Ar abu režimai veikia normaliai"]]}
+  ["draudimas","Techninės pagalbos draudimas Europoje","Ar galioja tokio amžiaus autui, ar apima transportavimą iš užsienio"]]}
 ];
-const ITEMS = {}; SECTIONS.forEach(s=>s.items.forEach(i=>ITEMS[i[0]]={id:i[0],emoji:i[1],name:i[2],why:i[3],section:s.t}));
+const ITEMS = {}; SECTIONS.forEach(s=>s.items.forEach(i=>ITEMS[i[0]]={id:i[0],name:i[1],why:i[2],section:s.t}));
 
-let entries = new Map(); // id -> {id,time,type,item,name,target,note}
+let entries = new Map();
 const $ = s=>document.querySelector(s);
 const esc = s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt = t=>new Date(t*1000).toLocaleString("lt-LT",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"});
 function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("show"),2800)}
 
 /* ---------- Šaranas iš viršaus ---------- */
-function face(p, cx, cy, r){
-  const f=FACES[p], s=r/26; let g="";
-  const T=(x,y)=>`${cx+x*s},${cy+y*s}`;
-  if(f.style==="long") g+=`<path d="M${T(-27,-4)} Q${T(-30,30)} ${T(-20,32)} L${T(20,32)} Q${T(30,30)} ${T(27,-4)} Z" fill="${f.hair}"/>`;
-  if(f.style==="afro") g+=`<circle cx="${cx}" cy="${cy-6*s}" r="${32*s}" fill="${f.hair}"/>`;
-  if(f.style==="curly") g+=[-18,-6,6,18].map(x=>`<circle cx="${cx+x*s}" cy="${cy-20*s}" r="${11*s}" fill="${f.hair}"/>`).join("");
-  g+=`<ellipse cx="${cx-26*s}" cy="${cy+2*s}" rx="${5*s}" ry="${7*s}" fill="${f.skin}"/><ellipse cx="${cx+26*s}" cy="${cy+2*s}" rx="${5*s}" ry="${7*s}" fill="${f.skin}"/>`;
-  g+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${f.skin}"/>`;
-  if(f.style==="short") g+=`<path d="M${T(-25,-6)} Q${T(-24,-30)} ${T(0,-29)} Q${T(24,-30)} ${T(25,-6)} Q${T(12,-18)} ${T(-25,-6)} Z" fill="${f.hair}"/>`;
-  if(f.style==="buzz") g+=`<path d="M${T(-24,-8)} Q${T(0,-34)} ${T(24,-8)} Q${T(0,-20)} ${T(-24,-8)} Z" fill="${f.hair}" opacity=".85"/>`;
-  if(f.style==="long") g+=`<path d="M${T(-26,0)} Q${T(-26,-30)} ${T(0,-29)} Q${T(26,-30)} ${T(26,0)} Q${T(18,-16)} ${T(-4,-16)} Q${T(-18,-14)} ${T(-26,0)} Z" fill="${f.hair}"/>`;
-  if(f.style==="side") g+=`<path d="M${T(-25,-4)} Q${T(-22,-30)} ${T(4,-28)} Q${T(26,-26)} ${T(25,-8)} L${T(-6,-14)} Z" fill="${f.hair}"/>`;
-  if(f.style==="bald") g+=`<path d="M${T(-25,-2)} Q${T(-26,-12)} ${T(-20,-14)} L${T(-20,-2)} Z M${T(25,-2)} Q${T(26,-12)} ${T(20,-14)} L${T(20,-2)} Z" fill="${f.hair}"/>`;
-  if(f.beard) g+=`<path d="M${T(-22,4)} Q${T(-20,28)} ${T(0,28)} Q${T(20,28)} ${T(22,4)} Q${T(12,14)} ${T(0,13)} Q${T(-12,14)} ${T(-22,4)} Z" fill="${f.hair}" opacity=".9"/>`;
-  const eye = f.skin==="#6b3e26" ? "#fff" : "#1f2328";
-  if(f.skin==="#6b3e26") g+=`<circle cx="${cx-9*s}" cy="${cy-3*s}" r="${4.5*s}" fill="#fff"/><circle cx="${cx+9*s}" cy="${cy-3*s}" r="${4.5*s}" fill="#fff"/>`;
-  g+=`<circle cx="${cx-9*s}" cy="${cy-3*s}" r="${2.6*s}" fill="#1f2328"/><circle cx="${cx+9*s}" cy="${cy-3*s}" r="${2.6*s}" fill="#1f2328"/>`;
-  if(f.glasses) g+=`<g fill="none" stroke="#1f2328" stroke-width="${1.8*s}"><circle cx="${cx-9*s}" cy="${cy-3*s}" r="${7*s}"/><circle cx="${cx+9*s}" cy="${cy-3*s}" r="${7*s}"/><path d="M${T(-2,-3)} L${T(2,-3)}"/></g>`;
-  g+=`<circle cx="${cx-15*s}" cy="${cy+6*s}" r="${4*s}" fill="#ff8787" opacity=".35"/><circle cx="${cx+15*s}" cy="${cy+6*s}" r="${4*s}" fill="#ff8787" opacity=".35"/>`;
-  g+=`<path d="M${T(-10,8)} Q${T(0,f.beard?16:19)} ${T(10,8)}" fill="none" stroke="${f.beard?"#fff":"#7a2e1a"}" stroke-width="${2.6*s}" stroke-linecap="round"/>`;
-  return g;
-}
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-const SEATING = shuffle(PEOPLE); // atsitiktinė sėdėjimo tvarka
+const SEATING = shuffle(PEOPLE);
 function drawVan(){
-  // 2 + 3 + 2 sėdynės
-  const seats=[[120,190],[260,190],[85,350],[190,350],[295,350],[130,505],[250,505]];
+  const seats=[[120,196],[260,196],[85,352],[190,352],[295,352],[130,508],[250,508]];
   let s=`<defs>
     <linearGradient id="body" x1="0" x2="1"><stop offset="0" stop-color="#5c7c99"/><stop offset=".5" stop-color="#86a6c2"/><stop offset="1" stop-color="#5c7c99"/></linearGradient>
     <filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="6" stdDeviation="6" flood-opacity=".3"/></filter>
   </defs>`;
-  // ratai
   [[30,120],[350,120],[30,520],[350,520]].forEach(([x,y])=>s+=`<rect x="${x-16}" y="${y-38}" width="32" height="76" rx="9" fill="#222"/>`);
-  // veidrodėliai
   s+=`<path d="M38 132 L8 120 L8 146 L38 150 Z" fill="#4b6782"/><path d="M342 132 L372 120 L372 146 L342 150 Z" fill="#4b6782"/>`;
-  // kėbulas
   s+=`<path filter="url(#sh)" d="M70 20 Q190 -4 310 20 Q350 30 352 80 L356 600 Q356 630 320 634 L60 634 Q24 630 24 600 L28 80 Q30 30 70 20 Z" fill="url(#body)" stroke="#3f5b75" stroke-width="3"/>`;
-  // kapotas ir grotelės
   s+=`<path d="M78 30 Q190 12 302 30 L310 92 L70 92 Z" fill="#7896b1" stroke="#3f5b75" stroke-width="2"/>`;
   s+=`<path d="M190 24 L190 90" stroke="#3f5b75" stroke-width="1.5" opacity=".5"/>`;
   s+=`<rect x="58" y="22" width="40" height="10" rx="5" fill="#fff3bf"/><rect x="282" y="22" width="40" height="10" rx="5" fill="#fff3bf"/>`;
-  // priekinis stiklas
-  s+=`<path d="M70 98 L310 98 L302 132 L78 132 Z" fill="#a5d8ff" stroke="#3f5b75" stroke-width="2" opacity=".9"/>`;
-  // atluptas stogas: plėšyti kraštai + salonas
-  s+=`<path d="M46 140 L334 140 L338 600 Q338 612 326 612 L54 612 Q42 612 42 600 Z" fill="#3a3a40"/>`;
-  s+=`<path d="M42 140 l14 10 l12 -8 l14 12 l16 -10 l14 9 l16 -11 l12 10 l16 -9 l15 12 l14 -11 l16 9 l13 -10 l16 11 l14 -9 l15 10 l14 -12 l16 9 l13 -8 l14 11 l12 -9 l4 -4 Z" fill="#86a6c2" stroke="#3f5b75" stroke-width="2"/>`;
-  s+=`<path d="M300 150 Q350 120 372 70 Q360 110 330 158 Z" fill="#9ab4cc" stroke="#3f5b75" stroke-width="2"/>`;
-  s+=`<text x="190" y="68" text-anchor="middle" font-size="17" fill="#2f4a63" font-weight="800">stogo nėra 🤷</text>`;
-  // vairas
-  s+=`<circle cx="120" cy="150" r="17" fill="none" stroke="#111" stroke-width="5"/><path d="M103 150 L137 150 M120 150 L120 167" stroke="#111" stroke-width="4"/>`;
-  // galinis bagažas
-  s+=`<rect x="70" y="578" width="70" height="26" rx="5" fill="#c08b5c"/><rect x="150" y="582" width="50" height="22" rx="5" fill="#e8590c"/><text x="226" y="598" font-size="14" fill="#ccc">🧰 🛞 🧯</text>`;
+  s+=`<path d="M70 98 L310 98 L302 126 L78 126 Z" fill="#a5d8ff" stroke="#3f5b75" stroke-width="2" opacity=".9"/>`;
+  s+=`<path d="M46 132 L334 132 L338 600 Q338 612 326 612 L54 612 Q42 612 42 600 Z" fill="#3a3a40"/>`;
+  s+=`<path d="M42 132 l14 10 l12 -8 l14 12 l16 -10 l14 9 l16 -11 l12 10 l16 -9 l15 12 l14 -11 l16 9 l13 -10 l16 11 l14 -9 l15 10 l14 -12 l16 9 l13 -8 l14 11 l12 -9 l4 -4 Z" fill="#86a6c2" stroke="#3f5b75" stroke-width="2"/>`;
+  s+=`<path d="M300 142 Q350 116 372 66 Q360 106 330 150 Z" fill="#9ab4cc" stroke="#3f5b75" stroke-width="2"/>`;
+  s+=`<rect x="70" y="582" width="70" height="24" rx="5" fill="#c08b5c"/><rect x="150" y="586" width="50" height="20" rx="5" fill="#e8590c"/><rect x="210" y="584" width="36" height="22" rx="4" fill="#2f9e44"/><circle cx="276" cy="595" r="11" fill="#222" stroke="#666" stroke-width="3"/>`;
   seats.forEach(([x,y],i)=>{
-    const p=SEATING[i], w=i>=2&&i<=4?96:106;
+    const p=SEATING[i], w=i>=2&&i<=4?98:108;
     s+=`<g class="seat" tabindex="0" role="button" aria-label="${esc(p)}" data-person="${esc(p)}">
-      <rect class="cushion" x="${x-w/2}" y="${y-62}" width="${w}" height="132" rx="18" fill="#c9c2b5" stroke="#1f2328" stroke-width="2"/>
-      <rect x="${x-w/2+6}" y="${y+50}" width="${w-12}" height="14" rx="7" fill="#a59d8f"/>
-      ${face(p,x,y-14,30)}
-      <rect x="${x-w/2+4}" y="${y+22}" width="${w-8}" height="26" rx="8" fill="#1f2328"/>
-      <text x="${x}" y="${y+41}" text-anchor="middle" font-size="${p.length>10?13:16}" font-weight="800" fill="#fff">${esc(p)}</text>
-      <g class="check"><circle cx="${x+w/2-10}" cy="${y-54}" r="16" fill="#2b8a3e"/><path d="M${x+w/2-18} ${y-54} l6 6 l11 -12" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+      <rect class="cushion" x="${x-w/2}" y="${y-66}" width="${w}" height="134" rx="18" fill="#c9c2b5" stroke="#1f2328" stroke-width="2"/>
+      ${face(p,x,y-22,27)}
+      <rect x="${x-w/2+4}" y="${y+36}" width="${w-8}" height="26" rx="8" fill="#1f2328"/>
+      <text x="${x}" y="${y+55}" text-anchor="middle" font-size="${p.length>10?13:16}" font-weight="800" fill="#fff">${esc(p)}</text>
+      <g class="check"><circle cx="${x+w/2-10}" cy="${y-56}" r="16" fill="#2b8a3e"/><path d="M${x+w/2-18} ${y-56} l6 6 l11 -12" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/></g>
     </g>`;
   });
   $("#van").innerHTML=s;
 }
 drawVan();
 
-let pending=null;
-function ask(whatHtml){
-  return new Promise(res=>{
-    pending=res;
-    $("#mWhat").innerHTML=whatHtml;
-    document.querySelectorAll(".seat").forEach(g=>g.classList.remove("picked"));
-    $("#modal").classList.add("open"); document.body.classList.add("modal-open");
-  });
+/* ---------- kas aš: vienkartinis pasirinkimas, 3 kartus perklausiam ---------- */
+function readMe(){
+  try{const m=document.cookie.match(/(?:^|; )sharan_kas_as=([^;]+)/); if(m){const v=decodeURIComponent(m[1]); if(PEOPLE.includes(v)) return v}}catch(e){}
+  try{const v=localStorage.getItem(ME_KEY); if(PEOPLE.includes(v)) return v}catch(e){}
+  return null;
 }
-function closeModal(v){ $("#modal").classList.remove("open"); document.body.classList.remove("modal-open"); const r=pending; pending=null; if(r) r(v) }
+function saveMe(v){
+  try{document.cookie="sharan_kas_as="+encodeURIComponent(v)+"; max-age=31536000; path=/; SameSite=Lax"}catch(e){}
+  try{localStorage.setItem(ME_KEY,v)}catch(e){}
+}
+let ME=readMe(); if(ME) saveMe(ME);
+let pending=null, cand=null, step=0;
+function renderMe(){
+  $("#meBar").innerHTML = ME
+    ? `${avatar(ME,52)}<div class="txt">Tu esi <b>${esc(ME)}</b><div class="why">Užrakinta 🔒 Šioje naršyklėje daugiau neklausim ir pakeisti nebegalima. Suklydai? Rašyk Mindaugui.</div></div>`
+    : `<div class="txt"><b>Dar nežinom, kas tu</b><div class="why">Susirask save Šarane. Pasirinkti galėsi tik vieną kartą.</div></div><button id="meBtn">Pasirinkti, kas aš</button>`;
+}
+function openModal(){ $("#modal").classList.add("open"); document.body.classList.add("modal-open") }
+function showPick(){
+  cand=null; step=0; $("#sheet").className="sheet";
+  $("#pickView").hidden=false; $("#confirmView").hidden=true;
+  document.querySelectorAll(".seat").forEach(g=>g.classList.remove("picked"));
+}
+const QUESTIONS = [
+  n=>`Nu neknisk proto, karoče, seni. Ar tu tikrai esi <u>${esc(n)}</u>?<br><br>Jeigu taip, tai žinok: čia renkiesi paskutinį kartą, vėliau iš naujo pasirinkti nebus galima. Taigi rinkis atsakingai.`,
+  n=>`Dar kartą klausiu: ar TIKRAI tu <u>${esc(n)}</u>?<br><br>Ne kaimynas, ne brolis, ne „šiaip paspaudžiau“?`,
+  n=>`PASKUTINĮ KARTĄ, seni.<br><br>Paspausi „taip“ ir viskas: liksi <u>${esc(n)}</u> visiems laikams. Tikrai?`,
+];
+const YES = [n=>`Taip, aš ${n}`, n=>`Taip, tikrai aš ${n}`, n=>`TAIP! Aš ${n}, užskaityk!`];
+function showConfirm(){
+  $("#sheet").className="sheet r"+step;
+  $("#pickView").hidden=true; const v=$("#confirmView"); v.hidden=false;
+  v.innerHTML=`<div class="dots">${"🔴".repeat(step)}${"⚪".repeat(3-step)}</div>
+    ${avatar(cand,150)}
+    <div class="big">${QUESTIONS[step-1](cand)}</div>
+    <div class="btns"><button class="yes" id="cYes">${esc(YES[step-1](cand))}</button><button class="no" id="cNo">Ne, čia ne aš, grįžtam</button></div>`;
+  v.style.animation="none"; v.offsetWidth; v.style.animation="";
+}
+function finish(v){ $("#modal").classList.remove("open"); document.body.classList.remove("modal-open"); const r=pending; pending=null; if(r) r(v) }
+function requireMe(){
+  if(ME) return Promise.resolve(ME);
+  return new Promise(res=>{ pending=res; showPick(); openModal() });
+}
 function pick(g){
-  if(!pending) return;
-  g.classList.add("picked");
-  const p=g.dataset.person; const r=pending; pending=null;
-  setTimeout(()=>{ $("#modal").classList.remove("open"); document.body.classList.remove("modal-open"); r(p) }, 550);
+  if(!pending||cand) return;
+  g.classList.add("picked"); cand=g.dataset.person; step=1;
+  setTimeout(showConfirm,350);
 }
 $("#van").addEventListener("click",e=>{const g=e.target.closest(".seat"); if(g) pick(g)});
 $("#van").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){const g=e.target.closest(".seat"); if(g){e.preventDefault();pick(g)}}});
-$("#mCancel").onclick=()=>closeModal(null);
-$("#modal").addEventListener("click",e=>{if(e.target.id==="modal") closeModal(null)});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&pending) closeModal(null)});
+$("#confirmView").addEventListener("click",e=>{
+  if(e.target.id==="cNo") return showPick();
+  if(e.target.id!=="cYes") return;
+  if(step<3){ step++; showConfirm(); return }
+  ME=cand; saveMe(ME);
+  renderMe(); render(); toast(`Sveikas, ${ME}! Užskaityta 🤝`); finish(ME);
+});
+$("#mCancel").onclick=()=>finish(null);
+$("#modal").addEventListener("click",e=>{if(e.target.id==="modal"&&!cand) finish(null)});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&pending) finish(null)});
+$("#meBar").addEventListener("click",e=>{ if(e.target.id==="meBtn") requireMe() });
+renderMe();
 
 /* ---------- duomenys ---------- */
+let MY_IP="";
+async function getIp(){
+  if(MY_IP) return MY_IP;
+  try{const c=new AbortController(); setTimeout(()=>c.abort(),4000);
+    const r=await fetch("https://api.ipify.org?format=json",{signal:c.signal,cache:"no-store"}); MY_IP=String((await r.json()).ip||"").slice(0,45)}catch(e){}
+  return MY_IP;
+}
+getIp();
+function browser(ua){
+  if(!ua) return "";
+  const b=/Edg\//.test(ua)?"Edge":/OPR\//.test(ua)?"Opera":/SamsungBrowser/.test(ua)?"Samsung":/Firefox|FxiOS/.test(ua)?"Firefox":/Chrome|CriOS/.test(ua)?"Chrome":/Safari/.test(ua)?"Safari":"Naršyklė";
+  const o=/iPhone|iPad/.test(ua)?"iOS":/Android/.test(ua)?"Android":/Windows/.test(ua)?"Windows":/Mac OS X/.test(ua)?"macOS":/Linux/.test(ua)?"Linux":"";
+  return b+(o?" / "+o:"");
+}
+const stamp=t=>new Date(t*1000).toLocaleString("sv-SE",{timeZone:"Europe/Vilnius"});
+const meta=e=>`<span class="tech">${stamp(e.time)}${e.ip?" · IP "+esc(e.ip):""}${e.ua?" · "+esc(browser(e.ua)):""}</span>`;
 function parseNtfy(m){
   if(m.event!=="message") return null;
   try{const d=JSON.parse(m.message); if(!d||!d.type||!d.name) return null;
-    return {id:m.id,time:m.time,type:String(d.type),item:String(d.item||""),name:String(d.name).slice(0,40),target:String(d.target||""),note:String(d.note||"").slice(0,1000)}}catch(e){return null}
+    return {id:m.id,time:m.time,type:String(d.type),item:String(d.item||""),name:String(d.name).slice(0,40),target:String(d.target||""),note:String(d.note||"").slice(0,1000),ip:String(d.ip||"").slice(0,45),ua:String(d.ua||"").slice(0,300)}}catch(e){return null}
 }
 function add(e){ if(e&&e.id&&!entries.has(e.id)) entries.set(e.id,e) }
 function sorted(){ return [...entries.values()].sort((a,b)=>a.time-b.time||a.id.localeCompare(b.id)) }
-
 async function load(){
   const st=[];
   try{const r=await fetch(ARCHIVE+"?t="+Date.now(),{cache:"no-store"}); if(r.ok){(await r.json()).forEach(add)} else st.push("archyvas "+r.status)}catch(e){st.push("archyvas nepasiekiamas")}
@@ -313,16 +499,15 @@ async function load(){
   render();
 }
 async function send(payload){
+  payload.ip=await getIp(); payload.ua=navigator.userAgent.slice(0,300);
   const r=await fetch(NTFY,{method:"POST",body:JSON.stringify(payload)});
   if(!r.ok) throw new Error("HTTP "+r.status);
   add(parseNtfy(await r.json()));
   render();
 }
-
-// būsena vienam daiktui: kas aktyviai rūpinasi
 function stateFor(id){
   const ev=sorted().filter(e=>e.item===id);
-  const active=new Map(); // name -> claim event
+  const active=new Map();
   ev.forEach(e=>{ if(e.type==="claim") active.set(e.name,e); else if(e.type==="unclaim") active.delete(e.target) });
   return {events:ev.filter(e=>e.type==="claim"||e.type==="unclaim"), notes:ev.filter(e=>e.type==="note"), active:[...active.values()]};
 }
@@ -333,19 +518,20 @@ function render(){
     html+=`<h2>${esc(s.t)}</h2>`;
     for(const [id] of s.items){
       const it=ITEMS[id], st=stateFor(id); total++; if(st.active.length) done++;
+      const mine=ME&&st.active.some(c=>c.name===ME);
       html+=`<div class="item ${st.active.length?"done":""}" data-id="${id}">
         <div class="row">
-          <div><div class="title">${it.emoji} ${esc(it.name)}</div><div class="why">${esc(it.why)}</div></div>
-          <button data-claim="${id}">🙋 Pasirūpinsiu aš</button>
+          <div class="main">${icon(id)}<div><div class="title">${esc(it.name)}</div><div class="why">${esc(it.why)}</div></div></div>
+          ${mine?`<button class="ghost" disabled style="cursor:default;opacity:1">✅ Tu rūpiniesi</button>`:`<button data-claim="${id}">🙋 Pasirūpinsiu aš</button>`}
         </div>
         <div class="who">${st.active.length
-          ? `<span class="why">Rūpinasi:</span>`+st.active.map(c=>`<span class="tag">${esc(c.name)}<button title="Nuimti (liks istorijoje)" data-unclaim="${id}" data-target="${esc(c.name)}">✕</button></span>`).join("")
+          ? `<span class="why">Rūpinasi:</span>`+st.active.map(c=>`<span class="tag">${avatar(c.name,30)}${esc(c.name)}<button title="Nuimti (liks istorijoje)" data-unclaim="${id}" data-target="${esc(c.name)}">✕</button></span>`).join("")
           : `<span class="none">Dar niekas nepasirūpino</span>`}</div>
         ${st.events.length?`<details><summary>Istorija (${st.events.length})</summary><ul>${st.events.map(e=> e.type==="claim"
-            ? `<li>${fmt(e.time)} · <b>${esc(e.name)}</b> pasirūpins</li>`
-            : `<li class="off">${fmt(e.time)} · ${esc(e.name)} nuėmė${e.target!==e.name?` <b>${esc(e.target)}</b>`:""} pasirūpinimą</li>`).join("")}</ul></details>`:""}
+            ? `<li>${avatar(e.name,22)} <b>${esc(e.name)}</b> pasirūpins ${meta(e)}</li>`
+            : `<li class="off">${avatar(e.name,22)} ${esc(e.name)} nuėmė${e.target!==e.name?` <b>${esc(e.target)}</b>`:""} pasirūpinimą ${meta(e)}</li>`).join("")}</ul></details>`:""}
         <div class="notes">
-          ${st.notes.map(n=>`<div class="note"><span class="meta"><b>${esc(n.name)}</b> · ${fmt(n.time)}:</span> ${esc(n.note)}</div>`).join("")}
+          ${st.notes.map(n=>`<div class="note">${avatar(n.name,26)}<div><span class="meta"><b>${esc(n.name)}</b>:</span> ${esc(n.note)}<br>${meta(n)}</div></div>`).join("")}
           <div class="note-form"><input maxlength="300" placeholder="Pastaba…" data-note="${id}"><button class="ghost" data-postnote="${id}">Paskelbti pastabą</button></div>
         </div>
       </div>`;
@@ -361,39 +547,42 @@ function render(){
   $("#bar").style.width=(done/total*100)+"%";
   $("#barLabel").textContent=`Pasirūpinta ${done} iš ${total}`;
   const cs=sorted().filter(e=>e.type==="comment");
-  $("#comments").innerHTML = cs.length? cs.map(c=>`<div class="comment"><div class="meta"><b>${esc(c.name)}</b> · ${fmt(c.time)}</div><div>${esc(c.note).replace(/\n/g,"<br>")}</div></div>`).join("") : `<p class="why">Kol kas komentarų nėra.</p>`;
+  $("#comments").innerHTML = cs.length? cs.map(c=>`<div class="comment">${avatar(c.name,46)}<div><div class="meta"><b>${esc(c.name)}</b></div><div>${esc(c.note).replace(/\n/g,"<br>")}</div>${meta(c)}</div></div>`).join("") : `<p class="why">Kol kas komentarų nėra.</p>`;
 }
 
-async function act(btn, payloadFn, okMsg){
-  btn.disabled=true;
+let busy=false;
+async function act(payloadFn, okMsg){
+  if(busy) return; busy=true;
   try{ await send(payloadFn()); toast(okMsg) }
   catch(e){ toast("Nepavyko išsaugoti, bandyk dar kartą ("+e.message+")") }
-  finally{ btn.disabled=false }
+  finally{ busy=false }
 }
 document.addEventListener("click",async ev=>{
   let b;
   if(b=ev.target.closest("[data-claim]")){
     const id=b.dataset.claim, it=ITEMS[id];
-    const name=await ask(`Pasirūpinsi: <b>${it.emoji} ${esc(it.name)}</b><br>Susirask save Šarane ir spausk 👇`); if(!name) return;
-    if(stateFor(id).active.some(c=>c.name===name)){ toast(`${name}, tu jau rūpiniesi šituo 👍`); return }
-    await act(b,()=>({type:"claim",item:id,name}),`✅ Užregistruota: ${name} pasirūpins „${it.name}“`);
+    const name=await requireMe(); if(!name) return;
+    if(stateFor(id).active.some(c=>c.name===name)){ toast(`${name}, tu jau rūpiniesi šituo 👍`); render(); return }
+    await act(()=>({type:"claim",item:id,name}),`✅ Užregistruota: ${name} pasirūpins „${it.name}“`);
   } else if(b=ev.target.closest("[data-unclaim]")){
     const id=b.dataset.unclaim, target=b.dataset.target, it=ITEMS[id];
-    const name=await ask(`Nuimi <b>${esc(target)}</b> nuo <b>${esc(it.name)}</b>.<br>Istorijoje liks. Kas tu?`); if(!name) return;
-    await act(b,()=>({type:"unclaim",item:id,name,target}),`↩️ Nuimta: ${target} nebesirūpina „${it.name}“`);
+    const name=await requireMe(); if(!name) return;
+    await act(()=>({type:"unclaim",item:id,name,target}),`↩️ Nuimta: ${target} nebesirūpina „${it.name}“`);
   } else if(b=ev.target.closest("[data-postnote]")){
     const id=b.dataset.postnote, inp=document.querySelector(`[data-note="${id}"]`), note=inp.value.trim();
     if(!note){ toast("Pirma parašyk pastabą"); inp.focus(); return }
-    const name=await ask(`Pastaba prie <b>${esc(ITEMS[id].name)}</b>:<br>„${esc(note)}“<br>Kas rašo?`); if(!name) return;
-    await act(b,()=>({type:"note",item:id,name,note}),"📝 Pastaba paskelbta");
-    const ni=document.querySelector(`[data-note="${id}"]`); if(ni&&entries.size) ni.value="";
+    const name=await requireMe(); if(!name) return;
+    const before=entries.size;
+    await act(()=>({type:"note",item:id,name,note}),"📝 Pastaba paskelbta");
+    if(entries.size>before){ const ni=document.querySelector(`[data-note="${id}"]`); if(ni) ni.value="" }
   }
 });
 $("#cSend").addEventListener("click",async()=>{
   const t=$("#cText").value.trim(); if(!t){toast("Parašyk komentarą");return}
-  const name=await ask(`Komentaras:<br>„${esc(t.length>120?t.slice(0,120)+"…":t)}“<br>Kas rašo?`); if(!name) return;
-  await act($("#cSend"),()=>({type:"comment",name,note:t}),"💬 Komentaras paskelbtas");
-  $("#cText").value="";
+  const name=await requireMe(); if(!name) return;
+  const before=entries.size;
+  await act(()=>({type:"comment",name,note:t}),"💬 Komentaras paskelbtas");
+  if(entries.size>before) $("#cText").value="";
 });
 
 /* ---------- eksportas ---------- */
@@ -408,14 +597,14 @@ $("#dlSummary").onclick=()=>{
   download("sarano-rinkinys-suvestine.csv",csv(rows),"text/csv;charset=utf-8");
 };
 $("#dlHistory").onclick=()=>{
-  const rows=[["Laikas (Vilnius)","Tipas","Daiktas","Kas","Kam taikoma","Pastaba / komentaras"]];
-  sorted().forEach(e=>rows.push([iso(e.time),TYPES[e.type]||e.type,ITEMS[e.item]?.name||"",e.name,e.target,e.note]));
+  const rows=[["Laikas (Vilnius)","Tipas","Daiktas","Kas","Kam taikoma","Pastaba / komentaras","IP","Naršyklė","User-Agent"]];
+  sorted().forEach(e=>rows.push([iso(e.time),TYPES[e.type]||e.type,ITEMS[e.item]?.name||"",e.name,e.target,e.note,e.ip||"",browser(e.ua),e.ua||""]));
   download("sarano-rinkinys-istorija.csv",csv(rows),"text/csv;charset=utf-8");
 };
 $("#dlJson").onclick=()=>download("sarano-rinkinys.json",JSON.stringify(sorted(),null,2),"application/json");
 
 load(); setInterval(()=>{ if(!document.hidden && !pending) load() },20000);
-document.addEventListener("visibilitychange",()=>{if(!document.hidden) load()});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden && !pending) load()});
 </script>
 </body>
 </html>

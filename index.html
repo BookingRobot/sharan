@@ -1,20 +1,277 @@
 <!doctype html>
 <html lang="lt">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bičiulių kelionės</title>
-  <style>
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center;
-           font-family: system-ui, sans-serif; background: #f4f6f8; color: #1d2733; }
-    @media (prefers-color-scheme: dark) { body { background: #14181d; color: #e6e9ed; } }
-    h1 { font-size: clamp(2rem, 6vw, 4rem); margin: 0; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Šarano išgyvenimo rinkinys</title>
+<meta name="description" content="3 000 km, 4 dienos, 7 vyrai ir 500 € Šaranas. Kas kuo pasirūpina?">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚐</text></svg>">
+<style>
+:root{
+  --bg:#f3efe6; --card:#fffdf8; --ink:#1f2328; --muted:#6b6f76; --line:#e3ddd0;
+  --accent:#d9480f; --accent-ink:#fff; --ok:#2b8a3e; --ok-bg:#e6f4ea; --warn-bg:#fff4e0;
+  --chip:#f1ece1;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#15171a; --card:#1e2125; --ink:#e8e6e1; --muted:#9a9ea5; --line:#30343a;
+    --accent:#ff7a3d; --accent-ink:#1a1a1a; --ok:#69db7c; --ok-bg:#1d3324; --warn-bg:#3a2d18; --chip:#2a2e33; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px 60px}
+header{padding:40px 0 20px}
+h1{font-size:clamp(1.8rem,6vw,2.8rem);line-height:1.1;margin:0 0 8px}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.stats span{background:var(--chip);border-radius:999px;padding:4px 12px;font-weight:600;font-size:.9rem}
+.lead{color:var(--muted);margin:8px 0 0}
+.how{background:var(--warn-bg);border-radius:12px;padding:14px 16px;margin:20px 0;font-size:.95rem}
+.how b{color:var(--accent)}
+.progress{margin:18px 0 4px;background:var(--line);border-radius:999px;height:12px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--ok);width:0;transition:width .4s}
+.progress-label{font-size:.9rem;color:var(--muted)}
+.me{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;position:sticky;top:8px;z-index:5;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.me label{font-weight:600}
+select,input,textarea,button{font:inherit;color:inherit}
+select,input,textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+textarea{width:100%;min-height:70px;resize:vertical}
+button{cursor:pointer;border:0;border-radius:8px;padding:8px 14px;font-weight:600;background:var(--accent);color:var(--accent-ink)}
+button.ghost{background:var(--chip);color:var(--ink)}
+button:disabled{opacity:.5;cursor:wait}
+h2{margin:36px 0 12px;font-size:1.35rem}
+.item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0}
+.item.done{border-color:var(--ok);box-shadow:inset 4px 0 0 var(--ok)}
+.row{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.title{font-weight:700}
+.why{color:var(--muted);font-size:.92rem}
+.who{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tag{background:var(--ok-bg);color:var(--ok);border-radius:999px;padding:2px 10px;font-weight:700;font-size:.88rem}
+.none{color:var(--accent);font-size:.88rem;font-weight:600}
+.act{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.act input{width:180px;max-width:100%}
+details{margin-top:6px;font-size:.85rem;color:var(--muted)}
+details summary{cursor:pointer}
+details ul{margin:6px 0 0;padding-left:18px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.box ol,.box ul{margin:0;padding-left:20px}
+.box li{margin:6px 0}
+.comment{border-top:1px solid var(--line);padding:10px 0}
+.comment:first-child{border-top:0}
+.comment .meta{font-size:.85rem;color:var(--muted)}
+.comment .meta b{color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:10}
+.toast.show{opacity:1}
+.export{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.status{font-size:.8rem;color:var(--muted);margin-top:24px}
+@media (max-width:560px){.act input{width:100%}.act{width:100%}}
+</style>
 </head>
 <body>
-  <main>
-    <h1>Hello World 👋</h1>
-    <p>Bičiulių kelionių puslapis jau greitai.</p>
-  </main>
+<div class="wrap">
+<header>
+  <h1>🚐 Šarano išgyvenimo rinkinys</h1>
+  <div class="stats"><span>3 000 km</span><span>4 dienos</span><span>7 vyrai</span><span>500 € vertės Šaranas</span></div>
+  <p class="lead">Tikslas: ne remontuoti automobilį, o sugebėti išspręsti smulkius gedimus ir pasiekti artimiausią servisą.</p>
+  <div class="how">
+    <b>Kaip naudotis:</b> viršuje pasirink savo vardą, prie daikto spausk <b>„Pasirūpinsiu aš“</b>. Įrašas išsaugomas ir nebeištrinamas.
+    Persigalvojai ar perimi kito daiktą? Tiesiog užsirašyk ant viršaus, ir visa istorija matysis su laiku. Gali pridėti trumpą pastabą (pvz. „turiu garaže“).
+    Susitariam per 12 valandų!
+  </div>
+  <div class="progress"><i id="bar"></i></div>
+  <div class="progress-label" id="barLabel">Kraunama…</div>
+</header>
+
+<div class="me">
+  <label for="who">Aš esu:</label>
+  <select id="who"><option value="">– pasirink vardą –</option></select>
+  <span class="why" id="meHint">Vardas atsimenamas šiame įrenginyje.</span>
+</div>
+
+<main id="sections"></main>
+
+<h2>⚠️ Trys svarbiausi dalykai prieš išvažiuojant</h2>
+<div class="box"><ol>
+  <li><b>Padangos.</b> Kadangi nėra atsarginio rato, kompresorius ir remonto rinkinys būtini. Tačiau prakirstos padangos šone jie neišgelbės.</li>
+  <li><b>Aušinimo sistema.</b> Patikrinti žarnas, aušinimo skysčio lygį ir ar nekyla variklio temperatūra. Jei variklis kaista, sustoti, nebandyti važiuoti toliau.</li>
+  <li><b>Dujų sistema.</b> Patikrinti, ar automobilis normaliai važiuoja ir benzinu, ir LPG. Jei dujų sistema pradeda streikuoti, geriau važiuoti benzinu. Dujų nuotėkio patiems netaisyti.</li>
+</ol></div>
+
+<h2>💰 Biudžetas</h2>
+<div class="box"><ul>
+  <li>Jei nieko neturite, visas minimalus rinkinys kainuotų maždaug <b>60–100 €</b>, neskaičiuojant privalomos saugos įrangos.</li>
+  <li>Siūlymas: dar prieš kelionę už maždaug <b>20–40 €</b> nuvažiuoti į servisą ir paprašyti patikrinti aušinimo sistemą, diržus, padangas, stabdžius bei skysčių nuotėkius.</li>
+  <li>3 000 km per keturias dienas su 500 € kainavusiu Šaranu: techninės pagalbos draudimas Europoje gali būti vertingesnis už visą įrankių dėžę. Patikrinkit, ar jis galioja tokio amžiaus automobiliui ir ar apima transportavimą iš užsienio.</li>
+</ul></div>
+
+<h2>💬 Komentarai</h2>
+<div class="box">
+  <div id="comments"><p class="why">Kol kas komentarų nėra.</p></div>
+  <div style="margin-top:12px">
+    <textarea id="cText" maxlength="1000" placeholder="Tavo komentaras…"></textarea>
+    <div class="act" style="margin-top:8px">
+      <button id="cSend">Komentuoti</button>
+      <span class="why">Komentuojama vardu, kurį pasirinkai viršuje.</span>
+    </div>
+  </div>
+</div>
+
+<h2>📥 Eksportas</h2>
+<div class="box">
+  <p class="why" style="margin-top:0">Atsisiųsk dabartinę suvestinę Excel'iui (CSV) arba visą istoriją.</p>
+  <div class="export">
+    <button class="ghost" id="dlSummary">Suvestinė (CSV)</button>
+    <button class="ghost" id="dlHistory">Visa istorija (CSV)</button>
+    <button class="ghost" id="dlJson">Visa istorija (JSON)</button>
+  </div>
+</div>
+<p class="status" id="status"></p>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const PEOPLE = ["Simonas","Deksnys","Thūlė","Modė","Kvedaravičius","Vacys","Abramovič"];
+const TOPIC = "sharan-rinkinys-k7m3p9q2";
+const NTFY = "https://ntfy.sh/" + TOPIC;
+const ARCHIVE = "https://raw.githubusercontent.com/BookingRobot/sharan/main/data/entries.json";
+
+const SECTIONS = [
+ {t:"🔧 Minimalus remonto rinkinys", items:[
+  ["galvutes","🔧","Mažas galvučių ir atsuktuvų rinkinys","Atsukti, priveržti, pritvirtinti"],
+  ["reples","🔩","Universalios replės","Suimti, patraukti, užspausti"],
+  ["uzverzejai","🔗","Plastikiniai užveržėjai (10–15 vnt.)","Pritvirtinti atsilaisvinusias detales"],
+  ["armavimo","🩶","Armavimo lipni juosta","Laikiniems kėbulo ir plastiko remontams"],
+  ["izoliacine","⚡","Izoliacinė juosta","Laidams izoliuoti"],
+  ["saugikliai","🔌","Saugiklių rinkinys","Perdegusiems saugikliams pakeisti"],
+  ["zibintuvelis","🔦","Žibintuvėlis","Gedimams tamsoje"],
+  ["pirstines","🧤","Darbinės pirštinės","Kad rankų nenusiteptume"]]},
+ {t:"🛞 Padangos ir užvedimas", items:[
+  ["kompresorius","🛞","12 V kompresorius","Pripūsti padangą"],
+  ["padangu-rinkinys","🩹","Padangos remonto rinkinys su virvutėmis","Smulkiam protektoriaus pradūrimui"],
+  ["uzvedimo-laidai","🔋","Užvedimo laidai","Jei nusėstų akumuliatorius"],
+  ["liemenes","🦺","Atšvaitinės liemenės (7 vnt.)","Saugumui sustojus kelyje"]]},
+ {t:"🧴 Skysčiai", items:[
+  ["alyva","🛢️","Variklio alyva","1 l tinkamos specifikacijos"],
+  ["ausinimo","❄️","Aušinimo skystis","1 l tinkamo tipo"],
+  ["vanduo","💧","Vanduo","2 l avariniam papildymui"]]},
+ {t:"🚨 Privalomi ir labai rekomenduojami", items:[
+  ["trikampis","⚠️","Avarinis trikampis","Privalomas"],
+  ["vaistinele","🩺","Pirmosios pagalbos vaistinėlė","Privaloma"],
+  ["gesintuvas","🧯","Gesintuvas","Privalomas"],
+  ["vilkimo-kilpa","🪝","Vilkimo kilpa","Patikrinti, ar yra automobilyje"],
+  ["pagalbos-nr","📱","Techninės pagalbos Europoje numeris","Išsaugoti telefone ir pasidalinti su visais"]]},
+ {t:"📋 Užduotys prieš kelionę", items:[
+  ["servisas","🧰","Serviso patikra (20–40 €)","Aušinimo sistema, diržai, padangos, stabdžiai, nuotėkiai"],
+  ["draudimas","🛡️","Techninės pagalbos draudimas Europoje","Ar galioja tokio amžiaus autui, ar apima transportavimą iš užsienio"],
+  ["lpg","⛽","Patikrinti važiavimą benzinu ir LPG","Ar abu režimai veikia normaliai"]]}
+];
+const ITEMS = {}; SECTIONS.forEach(s=>s.items.forEach(i=>ITEMS[i[0]]={id:i[0],emoji:i[1],name:i[2],why:i[3],section:s.t}));
+
+let entries = new Map(); // id -> {id,time,type,item,name,note}
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = t=>new Date(t*1000).toLocaleString("lt-LT",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"});
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("show"),2600)}
+
+// name picker
+const sel=$("#who");
+PEOPLE.forEach(p=>sel.insertAdjacentHTML("beforeend",`<option>${esc(p)}</option>`));
+try{const saved=localStorage.getItem("sharan-name"); if(saved&&PEOPLE.includes(saved)) sel.value=saved;}catch(e){}
+sel.addEventListener("change",()=>{try{localStorage.setItem("sharan-name",sel.value)}catch(e){}});
+function me(){ if(!sel.value){toast("Pirma viršuje pasirink savo vardą");sel.focus();sel.scrollIntoView({block:"center"});return null} return sel.value }
+
+function parseNtfy(m){
+  if(m.event!=="message") return null;
+  try{const d=JSON.parse(m.message); if(!d||!d.type||!d.name) return null;
+    return {id:m.id,time:m.time,type:String(d.type),item:String(d.item||""),name:String(d.name).slice(0,40),note:String(d.note||"").slice(0,1000)}}catch(e){return null}
+}
+function add(e){ if(e&&e.id&&!entries.has(e.id)) entries.set(e.id,e) }
+function sorted(){ return [...entries.values()].sort((a,b)=>a.time-b.time||a.id.localeCompare(b.id)) }
+
+async function load(){
+  const st=[];
+  try{const r=await fetch(ARCHIVE+"?t="+Date.now(),{cache:"no-store"}); if(r.ok){(await r.json()).forEach(add)} else st.push("archyvas "+r.status)}catch(e){st.push("archyvas nepasiekiamas")}
+  try{const r=await fetch(NTFY+"/json?poll=1&since=all",{cache:"no-store"});
+    if(r.ok){(await r.text()).split("\n").filter(Boolean).forEach(l=>{try{add(parseNtfy(JSON.parse(l)))}catch(e){}})} else st.push("ntfy "+r.status)}catch(e){st.push("ntfy nepasiekiamas")}
+  $("#status").textContent = "Atnaujinta "+new Date().toLocaleTimeString("lt-LT")+" · įrašų: "+entries.size+(st.length?" · "+st.join(", "):"");
+  render();
+}
+
+async function send(payload){
+  const r=await fetch(NTFY,{method:"POST",body:JSON.stringify(payload)});
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  add(parseNtfy(await r.json()));
+  render();
+}
+
+function claimsFor(id){ return sorted().filter(e=>e.type==="claim"&&e.item===id) }
+
+function render(){
+  let html="", done=0, total=0;
+  for(const s of SECTIONS){
+    html+=`<h2>${esc(s.t)}</h2>`;
+    for(const [id] of s.items){
+      const it=ITEMS[id], cl=claimsFor(id); total++; if(cl.length) done++;
+      const names=[...new Set(cl.map(c=>c.name))];
+      const last=cl[cl.length-1];
+      html+=`<div class="item ${cl.length?"done":""}" data-id="${id}">
+        <div class="row">
+          <div><div class="title">${it.emoji} ${esc(it.name)}</div><div class="why">${esc(it.why)}</div></div>
+          <div class="act"><input maxlength="200" placeholder="Pastaba (nebūtina)" data-note="${id}"><button data-claim="${id}">Pasirūpinsiu aš</button></div>
+        </div>
+        <div class="who">${cl.length?`<span class="why">Rūpinasi:</span>`+names.map(n=>`<span class="tag">${esc(n)}</span>`).join("")+`<span class="why">· paskutinis: ${esc(last.name)}, ${fmt(last.time)}</span>`:`<span class="none">Dar niekas nepasirūpino</span>`}</div>
+        ${cl.length?`<details><summary>Istorija (${cl.length})</summary><ul>${cl.map(c=>`<li>${fmt(c.time)} · <b>${esc(c.name)}</b> pasirūpins${c.note?` – „${esc(c.note)}“`:""}</li>`).join("")}</ul></details>`:""}
+      </div>`;
+    }
+  }
+  const open=[...document.querySelectorAll("details[open]")].map(d=>d.closest(".item")?.dataset.id);
+  const notes={}; document.querySelectorAll("[data-note]").forEach(i=>{if(i.value)notes[i.dataset.note]=i.value});
+  const focused=document.activeElement?.dataset?.note;
+  $("#sections").innerHTML=html;
+  open.forEach(id=>{const d=document.querySelector(`.item[data-id="${id}"] details`); if(d) d.open=true});
+  Object.entries(notes).forEach(([k,v])=>{const i=document.querySelector(`[data-note="${k}"]`); if(i) i.value=v});
+  if(focused){const i=document.querySelector(`[data-note="${focused}"]`); if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}}
+  $("#bar").style.width=(done/total*100)+"%";
+  $("#barLabel").textContent=`Pasirūpinta ${done} iš ${total}`;
+  const cs=sorted().filter(e=>e.type==="comment");
+  $("#comments").innerHTML = cs.length? cs.map(c=>`<div class="comment"><div class="meta"><b>${esc(c.name)}</b> · ${fmt(c.time)}</div><div>${esc(c.note).replace(/\n/g,"<br>")}</div></div>`).join("") : `<p class="why">Kol kas komentarų nėra.</p>`;
+}
+
+document.addEventListener("click",async ev=>{
+  const b=ev.target.closest("[data-claim]"); if(!b) return;
+  const name=me(); if(!name) return;
+  const id=b.dataset.claim, note=document.querySelector(`[data-note="${id}"]`).value.trim();
+  b.disabled=true;
+  try{await send({type:"claim",item:id,name,note}); document.querySelector(`[data-note="${id}"]`).value=""; toast(`Išsaugota: ${name} pasirūpins „${ITEMS[id].name}“`)}
+  catch(e){toast("Nepavyko išsaugoti, bandyk dar kartą ("+e.message+")")}
+  finally{const nb=document.querySelector(`[data-claim="${id}"]`); if(nb) nb.disabled=false}
+});
+$("#cSend").addEventListener("click",async()=>{
+  const name=me(); if(!name) return;
+  const t=$("#cText").value.trim(); if(!t){toast("Parašyk komentarą");return}
+  $("#cSend").disabled=true;
+  try{await send({type:"comment",name,note:t}); $("#cText").value=""; toast("Komentaras išsaugotas")}
+  catch(e){toast("Nepavyko išsaugoti ("+e.message+")")}
+  finally{$("#cSend").disabled=false}
+});
+
+// export
+function iso(t){const d=new Date(t*1000);return d.toLocaleString("sv-SE",{timeZone:"Europe/Vilnius"})}
+function csv(rows){return "﻿"+rows.map(r=>r.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(";")).join("\r\n")}
+function download(name,text,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+$("#dlSummary").onclick=()=>{
+  const rows=[["Skyrius","Daiktas","Kam / kiekis","Paskutinis užsirašęs","Visi užsirašę","Paskutinio įrašo laikas","Pastabos"]];
+  Object.values(ITEMS).forEach(it=>{const cl=claimsFor(it.id),l=cl[cl.length-1];
+    rows.push([it.section.replace(/^\S+\s/,""),it.name,it.why,l?.name||"",[...new Set(cl.map(c=>c.name))].join(", "),l?iso(l.time):"",cl.filter(c=>c.note).map(c=>c.name+": "+c.note).join(" | ")])});
+  download("sarano-rinkinys-suvestine.csv",csv(rows),"text/csv;charset=utf-8");
+};
+$("#dlHistory").onclick=()=>{
+  const rows=[["Laikas (Vilnius)","Tipas","Daiktas","Vardas","Pastaba / komentaras"]];
+  sorted().forEach(e=>rows.push([iso(e.time),e.type==="claim"?"Pasirūpinsiu":"Komentaras",ITEMS[e.item]?.name||"",e.name,e.note]));
+  download("sarano-rinkinys-istorija.csv",csv(rows),"text/csv;charset=utf-8");
+};
+$("#dlJson").onclick=()=>download("sarano-rinkinys.json",JSON.stringify(sorted(),null,2),"application/json");
+
+load(); setInterval(()=>{ if(!document.hidden) load() },20000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden) load()});
+</script>
 </body>
 </html>

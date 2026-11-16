@@ -10,16 +10,17 @@
 :root{
   --bg:#f3efe6; --card:#fffdf8; --ink:#1f2328; --muted:#6b6f76; --line:#e3ddd0;
   --accent:#d9480f; --accent-ink:#fff; --ok:#2b8a3e; --ok-bg:#e6f4ea; --warn-bg:#fff4e0;
-  --chip:#f1ece1;
+  --chip:#f1ece1; --off:#a0a4aa;
 }
 @media (prefers-color-scheme: dark){
   :root{ --bg:#15171a; --card:#1e2125; --ink:#e8e6e1; --muted:#9a9ea5; --line:#30343a;
-    --accent:#ff7a3d; --accent-ink:#1a1a1a; --ok:#69db7c; --ok-bg:#1d3324; --warn-bg:#3a2d18; --chip:#2a2e33; }
+    --accent:#ff7a3d; --accent-ink:#1a1a1a; --ok:#69db7c; --ok-bg:#1d3324; --warn-bg:#3a2d18; --chip:#2a2e33; --off:#6c7076; }
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body.modal-open{overflow:hidden}
 .wrap{max-width:860px;margin:0 auto;padding:0 16px 60px}
-header{padding:40px 0 20px}
+header{padding:40px 0 10px}
 h1{font-size:clamp(1.8rem,6vw,2.8rem);line-height:1.1;margin:0 0 8px}
 .stats{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 .stats span{background:var(--chip);border-radius:999px;padding:4px 12px;font-weight:600;font-size:.9rem}
@@ -29,10 +30,8 @@ h1{font-size:clamp(1.8rem,6vw,2.8rem);line-height:1.1;margin:0 0 8px}
 .progress{margin:18px 0 4px;background:var(--line);border-radius:999px;height:12px;overflow:hidden}
 .progress i{display:block;height:100%;background:var(--ok);width:0;transition:width .4s}
 .progress-label{font-size:.9rem;color:var(--muted)}
-.me{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;position:sticky;top:8px;z-index:5;box-shadow:0 4px 14px rgba(0,0,0,.06)}
-.me label{font-weight:600}
 select,input,textarea,button{font:inherit;color:inherit}
-select,input,textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+input,textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 textarea{width:100%;min-height:70px;resize:vertical}
 button{cursor:pointer;border:0;border-radius:8px;padding:8px 14px;font-weight:600;background:var(--accent);color:var(--accent-ink)}
 button.ghost{background:var(--chip);color:var(--ink)}
@@ -44,13 +43,19 @@ h2{margin:36px 0 12px;font-size:1.35rem}
 .title{font-weight:700}
 .why{color:var(--muted);font-size:.92rem}
 .who{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.tag{background:var(--ok-bg);color:var(--ok);border-radius:999px;padding:2px 10px;font-weight:700;font-size:.88rem}
+.tag{background:var(--ok-bg);color:var(--ok);border-radius:999px;padding:2px 4px 2px 12px;font-weight:700;font-size:.88rem;display:inline-flex;align-items:center;gap:4px}
+.tag button{background:transparent;color:inherit;padding:0 8px;font-size:.8rem;opacity:.75;border-radius:999px}
+.tag button:hover{opacity:1;background:rgba(0,0,0,.08)}
 .none{color:var(--accent);font-size:.88rem;font-weight:600}
-.act{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.act input{width:180px;max-width:100%}
 details{margin-top:6px;font-size:.85rem;color:var(--muted)}
 details summary{cursor:pointer}
 details ul{margin:6px 0 0;padding-left:18px}
+.off{text-decoration:line-through;color:var(--off)}
+.notes{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+.note{font-size:.9rem;margin:4px 0}
+.note .meta{color:var(--muted);font-size:.8rem}
+.note-form{display:flex;gap:6px;margin-top:6px}
+.note-form input{flex:1;min-width:0}
 .box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
 .box ol,.box ul{margin:0;padding-left:20px}
 .box li{margin:6px 0}
@@ -58,11 +63,28 @@ details ul{margin:6px 0 0;padding-left:18px}
 .comment:first-child{border-top:0}
 .comment .meta{font-size:.85rem;color:var(--muted)}
 .comment .meta b{color:var(--ink)}
-.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:10}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:30;max-width:90vw;text-align:center}
 .toast.show{opacity:1}
 .export{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .status{font-size:.8rem;color:var(--muted);margin-top:24px}
-@media (max-width:560px){.act input{width:100%}.act{width:100%}}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(10,12,15,.7);display:none;align-items:center;justify-content:center;z-index:20;padding:12px}
+.modal.open{display:flex}
+.sheet{background:var(--card);border-radius:18px;max-width:520px;width:100%;max-height:96vh;overflow:auto;padding:18px 18px 14px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35);animation:pop .18s ease-out}
+@keyframes pop{from{transform:scale(.94);opacity:0}to{transform:none;opacity:1}}
+.sheet h3{margin:0;font-size:clamp(1.5rem,5vw,2rem)}
+.sheet .what{color:var(--muted);margin:4px 0 8px}
+.sheet .what b{color:var(--accent)}
+#van{width:100%;max-height:68vh;display:block;margin:0 auto}
+.seat{cursor:pointer}
+.seat .cushion{transition:fill .15s}
+.seat:hover .cushion,.seat:focus .cushion{fill:#ffd8a8}
+.seat:focus{outline:none}
+.seat.picked .cushion{fill:#8ce99a}
+.seat .check{opacity:0;transition:opacity .2s}
+.seat.picked .check{opacity:1}
+.sheet .cancel{margin-top:8px}
 </style>
 </head>
 <body>
@@ -72,19 +94,14 @@ details ul{margin:6px 0 0;padding-left:18px}
   <div class="stats"><span>3 000 km</span><span>4 dienos</span><span>7 vyrai</span><span>500 € vertės Šaranas</span></div>
   <p class="lead">Tikslas: ne remontuoti automobilį, o sugebėti išspręsti smulkius gedimus ir pasiekti artimiausią servisą.</p>
   <div class="how">
-    <b>Kaip naudotis:</b> viršuje pasirink savo vardą, prie daikto spausk <b>„Pasirūpinsiu aš“</b>. Įrašas išsaugomas ir nebeištrinamas.
-    Persigalvojai ar perimi kito daiktą? Tiesiog užsirašyk ant viršaus, ir visa istorija matysis su laiku. Gali pridėti trumpą pastabą (pvz. „turiu garaže“).
+    <b>Kaip naudotis:</b> prie daikto spausk <b>„Pasirūpinsiu aš“</b> ir Šarane susirask save. Gali rūpintis ir keli.
+    Paspaudei netyčia ar persigalvojai? Spausk <b>✕</b> prie savo vardo: įrašas liks istorijoje, bet nebesiskaičiuos.
+    Po kiekvienu daiktu gali parašyti ir <b>pastabą</b> (pvz. „turiu garaže“). Niekas netrinama, viskas matosi su laiku.
     Susitariam per 12 valandų!
   </div>
   <div class="progress"><i id="bar"></i></div>
   <div class="progress-label" id="barLabel">Kraunama…</div>
 </header>
-
-<div class="me">
-  <label for="who">Aš esu:</label>
-  <select id="who"><option value="">– pasirink vardą –</option></select>
-  <span class="why" id="meHint">Vardas atsimenamas šiame įrenginyje.</span>
-</div>
 
 <main id="sections"></main>
 
@@ -99,7 +116,7 @@ details ul{margin:6px 0 0;padding-left:18px}
 <div class="box"><ul>
   <li>Jei nieko neturite, visas minimalus rinkinys kainuotų maždaug <b>60–100 €</b>, neskaičiuojant privalomos saugos įrangos.</li>
   <li>Siūlymas: dar prieš kelionę už maždaug <b>20–40 €</b> nuvažiuoti į servisą ir paprašyti patikrinti aušinimo sistemą, diržus, padangas, stabdžius bei skysčių nuotėkius.</li>
-  <li>3 000 km per keturias dienas su 500 € kainavusiu Šaranu: techninės pagalbos draudimas Europoje gali būti vertingesnis už visą įrankių dėžę. Patikrinkit, ar jis galioja tokio amžiaus automobiliui ir ar apima transportavimą iš užsienio.</li>
+  <li>3 000 km per keturias dienas su 500 € kainavusiu Šaranu: techninės pagalbos draudimas Europoje gali būti vertingesnis už visą įrankių dėžę. Patikrinkit, ar jis galioja tokio amžiaus autui ir ar apima transportavimą iš užsienio.</li>
 </ul></div>
 
 <h2>💬 Komentarai</h2>
@@ -107,10 +124,7 @@ details ul{margin:6px 0 0;padding-left:18px}
   <div id="comments"><p class="why">Kol kas komentarų nėra.</p></div>
   <div style="margin-top:12px">
     <textarea id="cText" maxlength="1000" placeholder="Tavo komentaras…"></textarea>
-    <div class="act" style="margin-top:8px">
-      <button id="cSend">Komentuoti</button>
-      <span class="why">Komentuojama vardu, kurį pasirinkai viršuje.</span>
-    </div>
+    <div style="margin-top:8px"><button id="cSend">Paskelbti komentarą</button></div>
   </div>
 </div>
 
@@ -125,13 +139,33 @@ details ul{margin:6px 0 0;padding-left:18px}
 </div>
 <p class="status" id="status"></p>
 </div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="sheet">
+    <h3 id="mTitle">Kas tu? 🤔</h3>
+    <p class="what" id="mWhat"></p>
+    <svg id="van" viewBox="0 0 380 640" role="group" aria-label="Šaranas iš viršaus"></svg>
+    <button class="ghost cancel" id="mCancel">Atšaukti</button>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
 const PEOPLE = ["Simonas","Deksnys","Thūlė","Modė","Kvedaravičius","Vacys","Abramovič"];
-const TOPIC = "sharan-rinkinys-k7m3p9q2";
+const TOPIC = "sharan-rinkinys-v2-h4t8w1";
 const NTFY = "https://ntfy.sh/" + TOPIC;
 const ARCHIVE = "https://raw.githubusercontent.com/BookingRobot/sharan/main/data/entries.json";
+
+// Faces: skin, hair colour, hair style, extras
+const FACES = {
+  "Simonas":       {skin:"#f2c9a0", hair:"#6b4423", style:"short",  beard:false, glasses:false},
+  "Deksnys":       {skin:"#eebb94", hair:"#2b2b2b", style:"buzz",   beard:true,  glasses:false},
+  "Thūlė":         {skin:"#f6d2b0", hair:"#e0b25a", style:"long",   beard:false, glasses:false},
+  "Modė":          {skin:"#e9b48a", hair:"#8a3b12", style:"curly",  beard:false, glasses:true},
+  "Kvedaravičius": {skin:"#6b3e26", hair:"#1a1a1a", style:"afro",   beard:true,  glasses:false},
+  "Vacys":         {skin:"#f0c49c", hair:"#b9b9b9", style:"bald",   beard:true,  glasses:true},
+  "Abramovič":     {skin:"#f3cfa9", hair:"#3b2a1a", style:"side",   beard:false, glasses:false},
+};
 
 const SECTIONS = [
  {t:"🔧 Minimalus remonto rinkinys", items:[
@@ -165,23 +199,107 @@ const SECTIONS = [
 ];
 const ITEMS = {}; SECTIONS.forEach(s=>s.items.forEach(i=>ITEMS[i[0]]={id:i[0],emoji:i[1],name:i[2],why:i[3],section:s.t}));
 
-let entries = new Map(); // id -> {id,time,type,item,name,note}
+let entries = new Map(); // id -> {id,time,type,item,name,target,note}
 const $ = s=>document.querySelector(s);
 const esc = s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt = t=>new Date(t*1000).toLocaleString("lt-LT",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"});
-function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("show"),2600)}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("show"),2800)}
 
-// name picker
-const sel=$("#who");
-PEOPLE.forEach(p=>sel.insertAdjacentHTML("beforeend",`<option>${esc(p)}</option>`));
-try{const saved=localStorage.getItem("sharan-name"); if(saved&&PEOPLE.includes(saved)) sel.value=saved;}catch(e){}
-sel.addEventListener("change",()=>{try{localStorage.setItem("sharan-name",sel.value)}catch(e){}});
-function me(){ if(!sel.value){toast("Pirma viršuje pasirink savo vardą");sel.focus();sel.scrollIntoView({block:"center"});return null} return sel.value }
+/* ---------- Šaranas iš viršaus ---------- */
+function face(p, cx, cy, r){
+  const f=FACES[p], s=r/26; let g="";
+  const T=(x,y)=>`${cx+x*s},${cy+y*s}`;
+  if(f.style==="long") g+=`<path d="M${T(-27,-4)} Q${T(-30,30)} ${T(-20,32)} L${T(20,32)} Q${T(30,30)} ${T(27,-4)} Z" fill="${f.hair}"/>`;
+  if(f.style==="afro") g+=`<circle cx="${cx}" cy="${cy-6*s}" r="${32*s}" fill="${f.hair}"/>`;
+  if(f.style==="curly") g+=[-18,-6,6,18].map(x=>`<circle cx="${cx+x*s}" cy="${cy-20*s}" r="${11*s}" fill="${f.hair}"/>`).join("");
+  g+=`<ellipse cx="${cx-26*s}" cy="${cy+2*s}" rx="${5*s}" ry="${7*s}" fill="${f.skin}"/><ellipse cx="${cx+26*s}" cy="${cy+2*s}" rx="${5*s}" ry="${7*s}" fill="${f.skin}"/>`;
+  g+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${f.skin}"/>`;
+  if(f.style==="short") g+=`<path d="M${T(-25,-6)} Q${T(-24,-30)} ${T(0,-29)} Q${T(24,-30)} ${T(25,-6)} Q${T(12,-18)} ${T(-25,-6)} Z" fill="${f.hair}"/>`;
+  if(f.style==="buzz") g+=`<path d="M${T(-24,-8)} Q${T(0,-34)} ${T(24,-8)} Q${T(0,-20)} ${T(-24,-8)} Z" fill="${f.hair}" opacity=".85"/>`;
+  if(f.style==="long") g+=`<path d="M${T(-26,0)} Q${T(-26,-30)} ${T(0,-29)} Q${T(26,-30)} ${T(26,0)} Q${T(18,-16)} ${T(-4,-16)} Q${T(-18,-14)} ${T(-26,0)} Z" fill="${f.hair}"/>`;
+  if(f.style==="side") g+=`<path d="M${T(-25,-4)} Q${T(-22,-30)} ${T(4,-28)} Q${T(26,-26)} ${T(25,-8)} L${T(-6,-14)} Z" fill="${f.hair}"/>`;
+  if(f.style==="bald") g+=`<path d="M${T(-25,-2)} Q${T(-26,-12)} ${T(-20,-14)} L${T(-20,-2)} Z M${T(25,-2)} Q${T(26,-12)} ${T(20,-14)} L${T(20,-2)} Z" fill="${f.hair}"/>`;
+  if(f.beard) g+=`<path d="M${T(-22,4)} Q${T(-20,28)} ${T(0,28)} Q${T(20,28)} ${T(22,4)} Q${T(12,14)} ${T(0,13)} Q${T(-12,14)} ${T(-22,4)} Z" fill="${f.hair}" opacity=".9"/>`;
+  const eye = f.skin==="#6b3e26" ? "#fff" : "#1f2328";
+  if(f.skin==="#6b3e26") g+=`<circle cx="${cx-9*s}" cy="${cy-3*s}" r="${4.5*s}" fill="#fff"/><circle cx="${cx+9*s}" cy="${cy-3*s}" r="${4.5*s}" fill="#fff"/>`;
+  g+=`<circle cx="${cx-9*s}" cy="${cy-3*s}" r="${2.6*s}" fill="#1f2328"/><circle cx="${cx+9*s}" cy="${cy-3*s}" r="${2.6*s}" fill="#1f2328"/>`;
+  if(f.glasses) g+=`<g fill="none" stroke="#1f2328" stroke-width="${1.8*s}"><circle cx="${cx-9*s}" cy="${cy-3*s}" r="${7*s}"/><circle cx="${cx+9*s}" cy="${cy-3*s}" r="${7*s}"/><path d="M${T(-2,-3)} L${T(2,-3)}"/></g>`;
+  g+=`<circle cx="${cx-15*s}" cy="${cy+6*s}" r="${4*s}" fill="#ff8787" opacity=".35"/><circle cx="${cx+15*s}" cy="${cy+6*s}" r="${4*s}" fill="#ff8787" opacity=".35"/>`;
+  g+=`<path d="M${T(-10,8)} Q${T(0,f.beard?16:19)} ${T(10,8)}" fill="none" stroke="${f.beard?"#fff":"#7a2e1a"}" stroke-width="${2.6*s}" stroke-linecap="round"/>`;
+  return g;
+}
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const SEATING = shuffle(PEOPLE); // atsitiktinė sėdėjimo tvarka
+function drawVan(){
+  // 2 + 3 + 2 sėdynės
+  const seats=[[120,190],[260,190],[85,350],[190,350],[295,350],[130,505],[250,505]];
+  let s=`<defs>
+    <linearGradient id="body" x1="0" x2="1"><stop offset="0" stop-color="#5c7c99"/><stop offset=".5" stop-color="#86a6c2"/><stop offset="1" stop-color="#5c7c99"/></linearGradient>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="6" stdDeviation="6" flood-opacity=".3"/></filter>
+  </defs>`;
+  // ratai
+  [[30,120],[350,120],[30,520],[350,520]].forEach(([x,y])=>s+=`<rect x="${x-16}" y="${y-38}" width="32" height="76" rx="9" fill="#222"/>`);
+  // veidrodėliai
+  s+=`<path d="M38 132 L8 120 L8 146 L38 150 Z" fill="#4b6782"/><path d="M342 132 L372 120 L372 146 L342 150 Z" fill="#4b6782"/>`;
+  // kėbulas
+  s+=`<path filter="url(#sh)" d="M70 20 Q190 -4 310 20 Q350 30 352 80 L356 600 Q356 630 320 634 L60 634 Q24 630 24 600 L28 80 Q30 30 70 20 Z" fill="url(#body)" stroke="#3f5b75" stroke-width="3"/>`;
+  // kapotas ir grotelės
+  s+=`<path d="M78 30 Q190 12 302 30 L310 92 L70 92 Z" fill="#7896b1" stroke="#3f5b75" stroke-width="2"/>`;
+  s+=`<path d="M190 24 L190 90" stroke="#3f5b75" stroke-width="1.5" opacity=".5"/>`;
+  s+=`<rect x="58" y="22" width="40" height="10" rx="5" fill="#fff3bf"/><rect x="282" y="22" width="40" height="10" rx="5" fill="#fff3bf"/>`;
+  // priekinis stiklas
+  s+=`<path d="M70 98 L310 98 L302 132 L78 132 Z" fill="#a5d8ff" stroke="#3f5b75" stroke-width="2" opacity=".9"/>`;
+  // atluptas stogas: plėšyti kraštai + salonas
+  s+=`<path d="M46 140 L334 140 L338 600 Q338 612 326 612 L54 612 Q42 612 42 600 Z" fill="#3a3a40"/>`;
+  s+=`<path d="M42 140 l14 10 l12 -8 l14 12 l16 -10 l14 9 l16 -11 l12 10 l16 -9 l15 12 l14 -11 l16 9 l13 -10 l16 11 l14 -9 l15 10 l14 -12 l16 9 l13 -8 l14 11 l12 -9 l4 -4 Z" fill="#86a6c2" stroke="#3f5b75" stroke-width="2"/>`;
+  s+=`<path d="M300 150 Q350 120 372 70 Q360 110 330 158 Z" fill="#9ab4cc" stroke="#3f5b75" stroke-width="2"/>`;
+  s+=`<text x="190" y="68" text-anchor="middle" font-size="17" fill="#2f4a63" font-weight="800">stogo nėra 🤷</text>`;
+  // vairas
+  s+=`<circle cx="120" cy="150" r="17" fill="none" stroke="#111" stroke-width="5"/><path d="M103 150 L137 150 M120 150 L120 167" stroke="#111" stroke-width="4"/>`;
+  // galinis bagažas
+  s+=`<rect x="70" y="578" width="70" height="26" rx="5" fill="#c08b5c"/><rect x="150" y="582" width="50" height="22" rx="5" fill="#e8590c"/><text x="226" y="598" font-size="14" fill="#ccc">🧰 🛞 🧯</text>`;
+  seats.forEach(([x,y],i)=>{
+    const p=SEATING[i], w=i>=2&&i<=4?96:106;
+    s+=`<g class="seat" tabindex="0" role="button" aria-label="${esc(p)}" data-person="${esc(p)}">
+      <rect class="cushion" x="${x-w/2}" y="${y-62}" width="${w}" height="132" rx="18" fill="#c9c2b5" stroke="#1f2328" stroke-width="2"/>
+      <rect x="${x-w/2+6}" y="${y+50}" width="${w-12}" height="14" rx="7" fill="#a59d8f"/>
+      ${face(p,x,y-14,30)}
+      <rect x="${x-w/2+4}" y="${y+22}" width="${w-8}" height="26" rx="8" fill="#1f2328"/>
+      <text x="${x}" y="${y+41}" text-anchor="middle" font-size="${p.length>10?13:16}" font-weight="800" fill="#fff">${esc(p)}</text>
+      <g class="check"><circle cx="${x+w/2-10}" cy="${y-54}" r="16" fill="#2b8a3e"/><path d="M${x+w/2-18} ${y-54} l6 6 l11 -12" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+    </g>`;
+  });
+  $("#van").innerHTML=s;
+}
+drawVan();
 
+let pending=null;
+function ask(whatHtml){
+  return new Promise(res=>{
+    pending=res;
+    $("#mWhat").innerHTML=whatHtml;
+    document.querySelectorAll(".seat").forEach(g=>g.classList.remove("picked"));
+    $("#modal").classList.add("open"); document.body.classList.add("modal-open");
+  });
+}
+function closeModal(v){ $("#modal").classList.remove("open"); document.body.classList.remove("modal-open"); const r=pending; pending=null; if(r) r(v) }
+function pick(g){
+  if(!pending) return;
+  g.classList.add("picked");
+  const p=g.dataset.person; const r=pending; pending=null;
+  setTimeout(()=>{ $("#modal").classList.remove("open"); document.body.classList.remove("modal-open"); r(p) }, 550);
+}
+$("#van").addEventListener("click",e=>{const g=e.target.closest(".seat"); if(g) pick(g)});
+$("#van").addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){const g=e.target.closest(".seat"); if(g){e.preventDefault();pick(g)}}});
+$("#mCancel").onclick=()=>closeModal(null);
+$("#modal").addEventListener("click",e=>{if(e.target.id==="modal") closeModal(null)});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&pending) closeModal(null)});
+
+/* ---------- duomenys ---------- */
 function parseNtfy(m){
   if(m.event!=="message") return null;
   try{const d=JSON.parse(m.message); if(!d||!d.type||!d.name) return null;
-    return {id:m.id,time:m.time,type:String(d.type),item:String(d.item||""),name:String(d.name).slice(0,40),note:String(d.note||"").slice(0,1000)}}catch(e){return null}
+    return {id:m.id,time:m.time,type:String(d.type),item:String(d.item||""),name:String(d.name).slice(0,40),target:String(d.target||""),note:String(d.note||"").slice(0,1000)}}catch(e){return null}
 }
 function add(e){ if(e&&e.id&&!entries.has(e.id)) entries.set(e.id,e) }
 function sorted(){ return [...entries.values()].sort((a,b)=>a.time-b.time||a.id.localeCompare(b.id)) }
@@ -194,7 +312,6 @@ async function load(){
   $("#status").textContent = "Atnaujinta "+new Date().toLocaleTimeString("lt-LT")+" · įrašų: "+entries.size+(st.length?" · "+st.join(", "):"");
   render();
 }
-
 async function send(payload){
   const r=await fetch(NTFY,{method:"POST",body:JSON.stringify(payload)});
   if(!r.ok) throw new Error("HTTP "+r.status);
@@ -202,23 +319,35 @@ async function send(payload){
   render();
 }
 
-function claimsFor(id){ return sorted().filter(e=>e.type==="claim"&&e.item===id) }
+// būsena vienam daiktui: kas aktyviai rūpinasi
+function stateFor(id){
+  const ev=sorted().filter(e=>e.item===id);
+  const active=new Map(); // name -> claim event
+  ev.forEach(e=>{ if(e.type==="claim") active.set(e.name,e); else if(e.type==="unclaim") active.delete(e.target) });
+  return {events:ev.filter(e=>e.type==="claim"||e.type==="unclaim"), notes:ev.filter(e=>e.type==="note"), active:[...active.values()]};
+}
 
 function render(){
   let html="", done=0, total=0;
   for(const s of SECTIONS){
     html+=`<h2>${esc(s.t)}</h2>`;
     for(const [id] of s.items){
-      const it=ITEMS[id], cl=claimsFor(id); total++; if(cl.length) done++;
-      const names=[...new Set(cl.map(c=>c.name))];
-      const last=cl[cl.length-1];
-      html+=`<div class="item ${cl.length?"done":""}" data-id="${id}">
+      const it=ITEMS[id], st=stateFor(id); total++; if(st.active.length) done++;
+      html+=`<div class="item ${st.active.length?"done":""}" data-id="${id}">
         <div class="row">
           <div><div class="title">${it.emoji} ${esc(it.name)}</div><div class="why">${esc(it.why)}</div></div>
-          <div class="act"><input maxlength="200" placeholder="Pastaba (nebūtina)" data-note="${id}"><button data-claim="${id}">Pasirūpinsiu aš</button></div>
+          <button data-claim="${id}">🙋 Pasirūpinsiu aš</button>
         </div>
-        <div class="who">${cl.length?`<span class="why">Rūpinasi:</span>`+names.map(n=>`<span class="tag">${esc(n)}</span>`).join("")+`<span class="why">· paskutinis: ${esc(last.name)}, ${fmt(last.time)}</span>`:`<span class="none">Dar niekas nepasirūpino</span>`}</div>
-        ${cl.length?`<details><summary>Istorija (${cl.length})</summary><ul>${cl.map(c=>`<li>${fmt(c.time)} · <b>${esc(c.name)}</b> pasirūpins${c.note?` – „${esc(c.note)}“`:""}</li>`).join("")}</ul></details>`:""}
+        <div class="who">${st.active.length
+          ? `<span class="why">Rūpinasi:</span>`+st.active.map(c=>`<span class="tag">${esc(c.name)}<button title="Nuimti (liks istorijoje)" data-unclaim="${id}" data-target="${esc(c.name)}">✕</button></span>`).join("")
+          : `<span class="none">Dar niekas nepasirūpino</span>`}</div>
+        ${st.events.length?`<details><summary>Istorija (${st.events.length})</summary><ul>${st.events.map(e=> e.type==="claim"
+            ? `<li>${fmt(e.time)} · <b>${esc(e.name)}</b> pasirūpins</li>`
+            : `<li class="off">${fmt(e.time)} · ${esc(e.name)} nuėmė${e.target!==e.name?` <b>${esc(e.target)}</b>`:""} pasirūpinimą</li>`).join("")}</ul></details>`:""}
+        <div class="notes">
+          ${st.notes.map(n=>`<div class="note"><span class="meta"><b>${esc(n.name)}</b> · ${fmt(n.time)}:</span> ${esc(n.note)}</div>`).join("")}
+          <div class="note-form"><input maxlength="300" placeholder="Pastaba…" data-note="${id}"><button class="ghost" data-postnote="${id}">Paskelbti pastabą</button></div>
+        </div>
       </div>`;
     }
   }
@@ -235,42 +364,57 @@ function render(){
   $("#comments").innerHTML = cs.length? cs.map(c=>`<div class="comment"><div class="meta"><b>${esc(c.name)}</b> · ${fmt(c.time)}</div><div>${esc(c.note).replace(/\n/g,"<br>")}</div></div>`).join("") : `<p class="why">Kol kas komentarų nėra.</p>`;
 }
 
+async function act(btn, payloadFn, okMsg){
+  btn.disabled=true;
+  try{ await send(payloadFn()); toast(okMsg) }
+  catch(e){ toast("Nepavyko išsaugoti, bandyk dar kartą ("+e.message+")") }
+  finally{ btn.disabled=false }
+}
 document.addEventListener("click",async ev=>{
-  const b=ev.target.closest("[data-claim]"); if(!b) return;
-  const name=me(); if(!name) return;
-  const id=b.dataset.claim, note=document.querySelector(`[data-note="${id}"]`).value.trim();
-  b.disabled=true;
-  try{await send({type:"claim",item:id,name,note}); document.querySelector(`[data-note="${id}"]`).value=""; toast(`Išsaugota: ${name} pasirūpins „${ITEMS[id].name}“`)}
-  catch(e){toast("Nepavyko išsaugoti, bandyk dar kartą ("+e.message+")")}
-  finally{const nb=document.querySelector(`[data-claim="${id}"]`); if(nb) nb.disabled=false}
+  let b;
+  if(b=ev.target.closest("[data-claim]")){
+    const id=b.dataset.claim, it=ITEMS[id];
+    const name=await ask(`Pasirūpinsi: <b>${it.emoji} ${esc(it.name)}</b><br>Susirask save Šarane ir spausk 👇`); if(!name) return;
+    if(stateFor(id).active.some(c=>c.name===name)){ toast(`${name}, tu jau rūpiniesi šituo 👍`); return }
+    await act(b,()=>({type:"claim",item:id,name}),`✅ Užregistruota: ${name} pasirūpins „${it.name}“`);
+  } else if(b=ev.target.closest("[data-unclaim]")){
+    const id=b.dataset.unclaim, target=b.dataset.target, it=ITEMS[id];
+    const name=await ask(`Nuimi <b>${esc(target)}</b> nuo <b>${esc(it.name)}</b>.<br>Istorijoje liks. Kas tu?`); if(!name) return;
+    await act(b,()=>({type:"unclaim",item:id,name,target}),`↩️ Nuimta: ${target} nebesirūpina „${it.name}“`);
+  } else if(b=ev.target.closest("[data-postnote]")){
+    const id=b.dataset.postnote, inp=document.querySelector(`[data-note="${id}"]`), note=inp.value.trim();
+    if(!note){ toast("Pirma parašyk pastabą"); inp.focus(); return }
+    const name=await ask(`Pastaba prie <b>${esc(ITEMS[id].name)}</b>:<br>„${esc(note)}“<br>Kas rašo?`); if(!name) return;
+    await act(b,()=>({type:"note",item:id,name,note}),"📝 Pastaba paskelbta");
+    const ni=document.querySelector(`[data-note="${id}"]`); if(ni&&entries.size) ni.value="";
+  }
 });
 $("#cSend").addEventListener("click",async()=>{
-  const name=me(); if(!name) return;
   const t=$("#cText").value.trim(); if(!t){toast("Parašyk komentarą");return}
-  $("#cSend").disabled=true;
-  try{await send({type:"comment",name,note:t}); $("#cText").value=""; toast("Komentaras išsaugotas")}
-  catch(e){toast("Nepavyko išsaugoti ("+e.message+")")}
-  finally{$("#cSend").disabled=false}
+  const name=await ask(`Komentaras:<br>„${esc(t.length>120?t.slice(0,120)+"…":t)}“<br>Kas rašo?`); if(!name) return;
+  await act($("#cSend"),()=>({type:"comment",name,note:t}),"💬 Komentaras paskelbtas");
+  $("#cText").value="";
 });
 
-// export
-function iso(t){const d=new Date(t*1000);return d.toLocaleString("sv-SE",{timeZone:"Europe/Vilnius"})}
+/* ---------- eksportas ---------- */
+function iso(t){return new Date(t*1000).toLocaleString("sv-SE",{timeZone:"Europe/Vilnius"})}
 function csv(rows){return "﻿"+rows.map(r=>r.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(";")).join("\r\n")}
 function download(name,text,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+const TYPES={claim:"Pasirūpinsiu",unclaim:"Nuimta",note:"Pastaba",comment:"Komentaras"};
 $("#dlSummary").onclick=()=>{
-  const rows=[["Skyrius","Daiktas","Kam / kiekis","Paskutinis užsirašęs","Visi užsirašę","Paskutinio įrašo laikas","Pastabos"]];
-  Object.values(ITEMS).forEach(it=>{const cl=claimsFor(it.id),l=cl[cl.length-1];
-    rows.push([it.section.replace(/^\S+\s/,""),it.name,it.why,l?.name||"",[...new Set(cl.map(c=>c.name))].join(", "),l?iso(l.time):"",cl.filter(c=>c.note).map(c=>c.name+": "+c.note).join(" | ")])});
+  const rows=[["Skyrius","Daiktas","Kam / kiekis","Rūpinasi (aktyvūs)","Paskutinis užsirašęs","Paskutinio įrašo laikas","Pastabos"]];
+  Object.values(ITEMS).forEach(it=>{const st=stateFor(it.id),l=st.active[st.active.length-1];
+    rows.push([it.section.replace(/^\S+\s/,""),it.name,it.why,st.active.map(c=>c.name).join(", "),l?.name||"",l?iso(l.time):"",st.notes.map(n=>n.name+": "+n.note).join(" | ")])});
   download("sarano-rinkinys-suvestine.csv",csv(rows),"text/csv;charset=utf-8");
 };
 $("#dlHistory").onclick=()=>{
-  const rows=[["Laikas (Vilnius)","Tipas","Daiktas","Vardas","Pastaba / komentaras"]];
-  sorted().forEach(e=>rows.push([iso(e.time),e.type==="claim"?"Pasirūpinsiu":"Komentaras",ITEMS[e.item]?.name||"",e.name,e.note]));
+  const rows=[["Laikas (Vilnius)","Tipas","Daiktas","Kas","Kam taikoma","Pastaba / komentaras"]];
+  sorted().forEach(e=>rows.push([iso(e.time),TYPES[e.type]||e.type,ITEMS[e.item]?.name||"",e.name,e.target,e.note]));
   download("sarano-rinkinys-istorija.csv",csv(rows),"text/csv;charset=utf-8");
 };
 $("#dlJson").onclick=()=>download("sarano-rinkinys.json",JSON.stringify(sorted(),null,2),"application/json");
 
-load(); setInterval(()=>{ if(!document.hidden) load() },20000);
+load(); setInterval(()=>{ if(!document.hidden && !pending) load() },20000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden) load()});
 </script>
 </body>

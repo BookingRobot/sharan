@@ -2,7 +2,7 @@
 import csv, json, urllib.request
 from datetime import datetime, timezone, timedelta
 
-TOPIC = "sharan-rinkinys-v3-q9d2x6"
+TOPIC = "sharan-rinkinys-v4-m7k3z5"
 PATH = "data/entries.json"
 
 with open(PATH, encoding="utf-8") as f:

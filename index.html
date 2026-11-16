@@ -87,6 +87,8 @@ details ul{margin:6px 0 0;padding-left:18px}
 .sheet .cancel{margin-top:8px}
 
 /* v3 */
+.secret{background:#f3e8ff;color:#4a1d7a;border:2px dashed #9c5fe0;border-radius:12px;padding:10px 14px;font-weight:600}
+.secret .cd{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.25rem;color:#c2255c;white-space:nowrap}
 .tech{font-size:.72rem;color:var(--muted);font-family:ui-monospace,Menlo,Consolas,monospace;text-decoration:none;display:inline-block}
 .me{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin:14px 0 0}
 .me .txt{flex:1}
@@ -313,6 +315,7 @@ const ICONS = {
    <rect x="18" y="30" width="16" height="22" rx="2" fill="#fff8e1"/><path d="M26 33 Q19 43 26 47 Q33 43 26 33 Z" fill="#343a40"/><text x="42" y="54" text-anchor="middle" font-size="8" font-weight="800" fill="#fff">1L</text>`,
  "ausinimo":`<rect x="20" y="5" width="13" height="10" rx="2" fill="#343a40"/><path d="M14 20 Q14 15 19 15 H40 L50 24 V56 Q50 60 46 60 H18 Q14 60 14 56 Z" fill="#12b886" stroke="#087f5b" stroke-width="2" stroke-linejoin="round"/><rect x="39" y="26" width="6" height="12" rx="3" fill="${BG}" stroke="#087f5b" stroke-width="1.5"/>
    <rect x="18" y="30" width="18" height="22" rx="2" fill="#fff"/><g stroke="#1c7ed6" stroke-width="2" stroke-linecap="round"><path d="M27 33 V49 M20 37 L34 45 M34 37 L20 45"/></g><text x="43" y="54" text-anchor="middle" font-size="8" font-weight="800" fill="#fff">1L</text>`,
+ "gandonai":[["#e03131",-14,6,8],["#7048e8",6,22,20],["#f59f00",-6,34,36]].map(([c,r,x,y])=>`<g transform="rotate(${r} ${x+11} ${y+11})"><rect x="${x}" y="${y}" width="24" height="24" rx="3" fill="${c}" stroke="${INK}" stroke-width="1.5"/><path d="M${x} ${y+3} h24 M${x} ${y+21} h24" stroke="#fff" stroke-width="1" stroke-dasharray="1.5 1.5" opacity=".7"/><circle cx="${x+12}" cy="${y+12}" r="6.5" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="${x+12}" cy="${y+12}" r="1.6" fill="#fff"/></g>`).join(""),
  "vanduo":`<rect x="26" y="3" width="12" height="7" rx="2" fill="#1c7ed6"/><path d="M27 10 H37 V16 Q47 20 47 30 V55 Q47 60 42 60 H22 Q17 60 17 55 V30 Q17 20 27 16 Z" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="2"/>
    <path d="M18 30 Q25 26 32 30 Q39 34 46 30 V55 Q46 59 42 59 H22 Q18 59 18 55 Z" fill="#74c0fc"/><path d="M17 38 H47 M17 46 H47" stroke="#1c7ed6" stroke-width="1" opacity=".4"/><text x="32" y="52" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">2L</text>`,
  "trikampis":`<path d="M14 58 L8 62 M50 58 L56 62" stroke="#495057" stroke-width="3" stroke-linecap="round"/><path d="M32 8 L58 54 H6 Z" fill="#fff" stroke="#e03131" stroke-width="8" stroke-linejoin="round"/><path d="M32 22 L46 47 H18 Z" fill="none" stroke="#ffa8a8" stroke-width="1.5" stroke-linejoin="round"/>`,
@@ -332,7 +335,11 @@ const ICONS = {
 };
 function icon(id){ return `<svg class="ico" viewBox="0 0 64 64" aria-hidden="true">${ICONS[id]||""}</svg>` }
 
+const SECRET_UNTIL = Date.parse("2026-11-16T22:00:00Z"); // vidurnaktis Vilniuje
+const secretOn = ()=>Date.now()<SECRET_UNTIL;
 const SECTIONS = [
+ {t:"🤫 Slaptas punktas", secret:true, items:[
+  ["gandonai","Gandonai: įvairių dydžių, spalvų ir skonių","Kas pasirūpins?"]]},
  {t:"🔧 Minimalus remonto rinkinys", items:[
   ["galvutes","Mažas galvučių ir atsuktuvų rinkinys","Atsukti, priveržti, pritvirtinti"],
   ["reples","Universalios replės","Suimti, patraukti, užspausti"],
@@ -346,16 +353,13 @@ const SECTIONS = [
   ["padangu-rinkinys","Padangos remonto rinkinys su virvutėmis","Smulkiam protektoriaus pradūrimui"],
   ["uzvedimo-laidai","Užvedimo laidai","Jei nusėstų akumuliatorius"],
   ["liemenes","Atšvaitinės liemenės (7 vnt.)","Saugumui sustojus kelyje"]]},
- {t:"🧴 Skysčiai", items:[
-  ["alyva","Variklio alyva","1 l tinkamos specifikacijos"],
-  ["ausinimo","Aušinimo skystis","1 l tinkamo tipo"],
-  ["vanduo","Vanduo","2 l avariniam papildymui"]]},
+ {t:"💧 Vanduo", items:[
+  ["vanduo","Gėlas vanduo (2 l)","Paprastas, ne mineralinis: radiatoriui papildyti, jeigu kas"]]},
  {t:"🚨 Privalomi ir labai rekomenduojami", items:[
   ["trikampis","Avarinis trikampis","Privalomas"],
   ["vaistinele","Pirmosios pagalbos vaistinėlė","Privaloma"],
   ["vaistai","Vaistai: aspirinas, ibuprofenas ir 3 pleistrai","Nes galvą tikrai kažkam skaudės"],
   ["gesintuvas","Gesintuvas","Privalomas"],
-  ["vilkimo-kilpa","Vilkimo kilpa","Patikrinti, ar yra automobilyje"],
   ["pagalbos-nr","Techninės pagalbos Europoje numeris","Išsaugoti telefone ir pasidalinti su visais"]]},
  {t:"📱 Telefonai ir krovimas", items:[
   ["laikiklis","Telefono laikiklis prie lango","Navigacijai, kad vairuotojui nereikėtų laikyti rankoje"],
@@ -364,7 +368,18 @@ const SECTIONS = [
  {t:"📋 Užduotys prieš kelionę", items:[
   ["draudimas","Techninės pagalbos draudimas Europoje","Ar galioja tokio amžiaus autui, ar apima transportavimą iš užsienio"]]}
 ];
-const ITEMS = {}; SECTIONS.forEach(s=>s.items.forEach(i=>ITEMS[i[0]]={id:i[0],name:i[1],why:i[2],section:s.t}));
+const ITEMS = {}; SECTIONS.forEach(s=>s.items.forEach(i=>ITEMS[i[0]]={id:i[0],name:i[1],why:i[2],section:s.t,secret:!!s.secret}));
+const shown = it=>it && (!it.secret || secretOn());
+function countdown(){
+  const ms=SECRET_UNTIL-Date.now(); if(ms<=0) return "00:00:00";
+  const p=n=>String(n).padStart(2,"0"), t=Math.floor(ms/1000);
+  return p(Math.floor(t/3600))+":"+p(Math.floor(t%3600/60))+":"+p(t%60);
+}
+let secretWas=secretOn();
+setInterval(()=>{
+  document.querySelectorAll(".cd").forEach(e=>e.textContent=countdown());
+  if(secretWas && !secretOn()){ secretWas=false; render() }
+},1000);
 
 let entries = new Map();
 const $ = s=>document.querySelector(s);
@@ -518,7 +533,9 @@ function stateFor(id){
 function render(){
   let html="", done=0, total=0;
   for(const s of SECTIONS){
+    if(s.secret && !secretOn()) continue;
     html+=`<h2>${esc(s.t)}</h2>`;
+    if(s.secret) html+=`<div class="secret">⏳ Šitas punktas matomas tik šiandien iki vidurnakčio, paskui dingsta be pėdsakų. Turit suspėti užsirašyti! Liko <b class="cd">${countdown()}</b></div>`;
     for(const [id] of s.items){
       const it=ITEMS[id], st=stateFor(id); total++; if(st.active.length) done++;
       const mine=ME&&st.active.some(c=>c.name===ME);
@@ -595,13 +612,13 @@ function download(name,text,type){const a=document.createElement("a");a.href=URL
 const TYPES={claim:"Pasirūpinsiu",unclaim:"Nuimta",note:"Pastaba",comment:"Komentaras"};
 $("#dlSummary").onclick=()=>{
   const rows=[["Skyrius","Daiktas","Kam / kiekis","Rūpinasi (aktyvūs)","Paskutinis užsirašęs","Paskutinio įrašo laikas","Pastabos"]];
-  Object.values(ITEMS).forEach(it=>{const st=stateFor(it.id),l=st.active[st.active.length-1];
+  Object.values(ITEMS).filter(shown).forEach(it=>{const st=stateFor(it.id),l=st.active[st.active.length-1];
     rows.push([it.section.replace(/^\S+\s/,""),it.name,it.why,st.active.map(c=>c.name).join(", "),l?.name||"",l?iso(l.time):"",st.notes.map(n=>n.name+": "+n.note).join(" | ")])});
   download("sarano-rinkinys-suvestine.csv",csv(rows),"text/csv;charset=utf-8");
 };
 $("#dlHistory").onclick=()=>{
   const rows=[["Laikas (Vilnius)","Tipas","Daiktas","Kas","Kam taikoma","Pastaba / komentaras","IP","Naršyklė","User-Agent"]];
-  sorted().forEach(e=>rows.push([iso(e.time),TYPES[e.type]||e.type,ITEMS[e.item]?.name||"",e.name,e.target,e.note,e.ip||"",browser(e.ua),e.ua||""]));
+  sorted().filter(e=>!e.item||shown(ITEMS[e.item])).forEach(e=>rows.push([iso(e.time),TYPES[e.type]||e.type,ITEMS[e.item]?.name||"",e.name,e.target,e.note,e.ip||"",browser(e.ua),e.ua||""]));
   download("sarano-rinkinys-istorija.csv",csv(rows),"text/csv;charset=utf-8");
 };
 $("#dlJson").onclick=()=>download("sarano-rinkinys.json",JSON.stringify(sorted(),null,2),"application/json");

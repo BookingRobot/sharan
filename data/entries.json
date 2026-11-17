@@ -1,1 +1,62 @@
-[]
+[
+ {
+  "id": "zYDmQ3KIpoaE",
+  "time": 1794851079,
+  "type": "claim",
+  "item": "prikurke",
+  "name": "Kvedaravičius",
+  "target": "",
+  "note": "",
+  "ip": "84.15.177.194",
+  "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 27_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/24A437 [FBAN/FBIOS;FBAV/587.0.0.25.106;FBBV/1111963724;FBDV/iPhone18,1;FBMD/iPhone;FBSN/iOS;FBSV/27.0;FBSS/3;FBCR/;FBID/phone;FBLC/en_LT;FBOP/80]",
+  "iso": "2026-11-16T17:44:39Z"
+ },
+ {
+  "id": "RQTv1ET4epUB",
+  "time": 1794851082,
+  "type": "claim",
+  "item": "usb",
+  "name": "Kvedaravičius",
+  "target": "",
+  "note": "",
+  "ip": "84.15.177.194",
+  "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 27_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/24A437 [FBAN/FBIOS;FBAV/587.0.0.25.106;FBBV/1111963724;FBDV/iPhone18,1;FBMD/iPhone;FBSN/iOS;FBSV/27.0;FBSS/3;FBCR/;FBID/phone;FBLC/en_LT;FBOP/80]",
+  "iso": "2026-11-16T17:44:42Z"
+ },
+ {
+  "id": "LSw1pLiB5Dae",
+  "time": 1794852667,
+  "type": "claim",
+  "item": "skocas",
+  "name": "Simonas",
+  "target": "",
+  "note": "",
+  "ip": "88.119.81.242",
+  "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 26_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/23G83 [FBAN/FBIOS;FBAV/587.0.0.25.106;FBBV/1111963724;FBDV/iPhone17,2;FBMD/iPhone;FBSN/iOS;FBSV/26.6.1;FBSS/3;FBCR/;FBID/phone;FBLC/en_LT;FBOP/80]",
+  "iso": "2026-11-16T18:11:07Z"
+ },
+ {
+  "id": "jxnuhrvilI8i",
+  "time": 1794852778,
+  "type": "note",
+  "item": "gandonai",
+  "name": "Simonas",
+  "target": "",
+  "note": "Kokios spalvos?",
+  "ip": "88.119.81.242",
+  "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 26_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/23G83 [FBAN/FBIOS;FBAV/587.0.0.25.106;FBBV/1111963724;FBDV/iPhone17,2;FBMD/iPhone;FBSN/iOS;FBSV/26.6.1;FBSS/3;FBCR/;FBID/phone;FBLC/en_LT;FBOP/80]",
+  "iso": "2026-11-16T18:12:58Z"
+ },
+ {
+  "id": "ZECU6ns63cg7",
+  "time": 1794860748,
+  "type": "claim",
+  "item": "vaistai",
+  "name": "Kvedaravičius",
+  "target": "",
+  "note": "",
+  "ip": "188.69.67.206",
+  "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 27_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/24A437 [FBAN/FBIOS;FBAV/587.0.0.25.106;FBBV/1111963724;FBDV/iPhone18,1;FBMD/iPhone;FBSN/iOS;FBSV/27.0;FBSS/3;FBCR/;FBID/phone;FBLC/en_LT;FBOP/80]",
+  "iso": "2026-11-16T20:25:48Z"
+ }
+]

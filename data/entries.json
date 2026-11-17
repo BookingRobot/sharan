@@ -58,5 +58,65 @@
   "ip": "188.69.67.206",
   "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 27_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/24A437 [FBAN/FBIOS;FBAV/587.0.0.25.106;FBBV/1111963724;FBDV/iPhone18,1;FBMD/iPhone;FBSN/iOS;FBSV/27.0;FBSS/3;FBCR/;FBID/phone;FBLC/en_LT;FBOP/80]",
   "iso": "2026-11-16T20:25:48Z"
+ },
+ {
+  "id": "53Z4OJRQgl7g",
+  "time": 1794897860,
+  "type": "claim",
+  "item": "galvutes",
+  "name": "Deksnys",
+  "target": "",
+  "note": "",
+  "ip": "78.60.152.94",
+  "ua": "Mozilla/5.0 (Linux; Android 10; K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/157.0.0.0 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/587.0.0.54.96;]",
+  "iso": "2026-11-17T06:44:20Z"
+ },
+ {
+  "id": "Phu125GCl5MQ",
+  "time": 1794897872,
+  "type": "unclaim",
+  "item": "galvutes",
+  "name": "Deksnys",
+  "target": "Deksnys",
+  "note": "",
+  "ip": "78.60.152.94",
+  "ua": "Mozilla/5.0 (Linux; Android 10; K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/157.0.0.0 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/587.0.0.54.96;]",
+  "iso": "2026-11-17T06:44:32Z"
+ },
+ {
+  "id": "YK5ZEVqtTsyr",
+  "time": 1794897875,
+  "type": "claim",
+  "item": "reples",
+  "name": "Deksnys",
+  "target": "",
+  "note": "",
+  "ip": "78.60.152.94",
+  "ua": "Mozilla/5.0 (Linux; Android 10; K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/157.0.0.0 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/587.0.0.54.96;]",
+  "iso": "2026-11-17T06:44:35Z"
+ },
+ {
+  "id": "ZJS9OA0rY2j2",
+  "time": 1794897883,
+  "type": "claim",
+  "item": "zibintuvelis",
+  "name": "Deksnys",
+  "target": "",
+  "note": "",
+  "ip": "78.60.152.94",
+  "ua": "Mozilla/5.0 (Linux; Android 10; K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/157.0.0.0 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/587.0.0.54.96;]",
+  "iso": "2026-11-17T06:44:43Z"
+ },
+ {
+  "id": "Fhed8PF8uefm",
+  "time": 1794897890,
+  "type": "claim",
+  "item": "pirstines",
+  "name": "Deksnys",
+  "target": "",
+  "note": "",
+  "ip": "78.60.152.94",
+  "ua": "Mozilla/5.0 (Linux; Android 10; K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/157.0.0.0 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/587.0.0.54.96;]",
+  "iso": "2026-11-17T06:44:50Z"
  }
 ]

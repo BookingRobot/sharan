@@ -6,6 +6,9 @@
 <title>Šarano išgyvenimo rinkinys</title>
 <meta name="description" content="3 000 km, 4 dienos, 7 vyrai ir 500 € Šaranas. Kas kuo pasirūpina?">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚐</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700..800&amp;family=Inter:wght@500..700&amp;display=swap">
 <style>
 :root{
   --bg:#f3efe6; --card:#fffdf8; --ink:#1f2328; --muted:#6b6f76; --line:#e3ddd0;
@@ -128,6 +131,39 @@ details ul{padding-left:4px}
 @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .dots{letter-spacing:6px;font-size:1.2rem}
 @media (max-width:560px){.item .row{flex-wrap:wrap}.item .row>button{width:100%}.ico{width:60px;height:60px}}
+/* dienos suvestinė: plakatas puslapio viršuje */
+#suv{padding:20px 0 0}
+.suv-box{position:relative;aspect-ratio:4/5;width:100%;max-width:max(300px,calc((100vh - 170px)*.8));margin:0 auto;border-radius:18px;overflow:hidden;background:#0E1430;box-shadow:0 14px 40px rgba(14,20,48,.3);-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#suv.col .suv-box{background:#fff;box-shadow:0 0 0 1px var(--line),0 14px 40px rgba(14,20,48,.18)}
+.suv-box svg{display:block;width:100%;height:100%}
+.suv-fx{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:hidden}
+.suv-em{position:absolute;line-height:1;margin:-.5em 0 0 -.5em;opacity:0;animation:suvEm .95s ease-out forwards}
+@keyframes suvEm{0%{opacity:0;transform:scale(.3)}15%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--r)) scale(1.15)}}
+.suv-ctl{display:flex;gap:8px;justify-content:center;margin:14px auto 8px;max-width:520px}
+.suv-ctl>*{flex:1 1 0;padding:9px 6px;font-size:.92rem;white-space:nowrap;text-align:center}
+.suv-btn{display:inline-block;border-radius:8px;padding:8px 14px;font-weight:600;background:var(--chip);color:var(--ink);text-decoration:none}
+.suv-hint{text-align:center;color:var(--muted);font-size:.9rem;font-weight:600;margin:0}
+.suv-pal{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin:0 0 10px}
+.suv-pal[hidden]{display:none}
+.suv-pal .sw{width:34px;height:34px;padding:0;border-radius:50%;background:var(--sw);border:2px solid var(--line)}
+.suv-pal .sw.on{outline:3px solid var(--accent);outline-offset:2px}
+.suv-foot{display:none}
+#suvModal img{display:block;max-width:100%;max-height:56vh;margin:10px auto 0;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+@media print{
+  html.suv-print,html.suv-print body{background:#fff!important;color:#000!important}
+  html.suv-print #gate,html.suv-print .modal,html.suv-print .toast,html.suv-print .wrap>*:not(#suv),
+  html.suv-print .suv-ctl,html.suv-print .suv-hint,html.suv-print .suv-pal,html.suv-print .suv-fx{display:none!important}
+  html.suv-print .wrap{max-width:none;padding:0}
+  html.suv-print #suv{padding:0}
+  html.suv-print .suv-box{width:178mm;max-width:100%;border-radius:0;box-shadow:none!important;break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html.suv-print .suv-foot{display:block;width:178mm;max-width:100%;margin:5mm auto 0;font-size:10pt;line-height:1.4;color:#000}
+  .suv-foot .cut{border-top:1.5px dashed #777;position:relative;margin-bottom:4mm}
+  .suv-foot .cut span{position:absolute;left:0;top:-.85em;background:#fff;padding-right:4px}
+  .suv-foot .sign{display:flex;gap:8px;align-items:flex-end;margin-top:5mm;font-weight:700}
+  .suv-foot .sign i{flex:1;border-bottom:1.5px dotted #000;height:1.2em}
+  .suv-foot .onlycol{display:none}
+  #suv.col .suv-foot .onlycol{display:block}
+}
 </style>
 </head>
 <body>
@@ -157,6 +193,22 @@ document.getElementById("gateForm").addEventListener("submit",function(e){
 if(document.documentElement.classList.contains("locked")) setTimeout(function(){document.getElementById("gatePw").focus()},50);
 </script>
 <div class="wrap">
+<section id="suv" aria-label="Dienos suvestinė">
+  <div class="suv-box" id="suvBox"><div class="suv-fx" id="suvFx"></div></div>
+  <div class="suv-ctl">
+    <button type="button" id="suvPrint">🖨️ Spausdinti</button>
+    <button type="button" class="ghost" id="suvCol">🖍️ Spalvinti</button>
+    <button type="button" class="ghost" id="suvShare">📤 Dalintis</button>
+  </div>
+  <div class="suv-pal" id="suvPal" hidden></div>
+  <p class="suv-hint" id="suvHint">👆 Paspausk Šaraną, burbulą ar skaičius</p>
+  <div class="suv-foot">
+    <div class="cut"><span>✂</span></div>
+    <div><b>Šarano dienos suvestinė</b> · <span id="suvFootDate"></span> · <span id="suvFootHost">sharan.bookingrobot.eu</span></div>
+    <div class="onlycol">Spalvinimo lapas: nuspalvink Šaraną, skaičius ir vėliavas, tada kabink ant šaldytuvo.</div>
+    <div class="sign">Tvirtinam, kad viskas taip ir buvo:<i></i></div>
+  </div>
+</section>
 <header>
   <h1>🚐 Šarano išgyvenimo rinkinys</h1>
   <div class="stats"><span>3 000 km</span><span>4 dienos</span><span>7 vyrai</span><span>500 € vertės Šaranas</span></div>
@@ -205,6 +257,18 @@ if(document.documentElement.classList.contains("locked")) setTimeout(function(){
       <button class="ghost cancel" id="mCancel">Atšaukti</button>
     </div>
     <div id="confirmView" hidden></div>
+  </div>
+</div>
+<div class="modal" id="suvModal" role="dialog" aria-modal="true" aria-labelledby="suvMT">
+  <div class="sheet">
+    <h3 id="suvMT">Paveikslėlis paruoštas 📸</h3>
+    <p class="what">Palaikyk paspaudęs ir išsaugok, arba rinkis žemiau.</p>
+    <img id="suvImg" alt="Šarano dienos suvestinė">
+    <div class="suv-ctl">
+      <button type="button" id="suvDoShare">📤 Dalintis</button>
+      <a class="suv-btn" id="suvDl">⬇️ Atsisiųsti</a>
+      <button type="button" class="ghost" id="suvClose">Uždaryti</button>
+    </div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -699,6 +763,268 @@ $("#dlJson").onclick=()=>download("sarano-rinkinys.json",JSON.stringify(sorted()
 
 load(); setInterval(()=>{ if(!document.hidden && !pending) load() },20000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden && !pending) load()});
+</script>
+<script id="suvJs">
+/* ===== Dienos suvestinė: interaktyvus plakatas puslapio viršuje =====
+   Nauja diena = pakeisti DAY (skaičiai, maršrutas, juokai). Viskas piešiama kaip SVG 1080x1350,
+   todėl vienodai atrodo telefone, spaudoje ir atsisiųstame paveikslėlyje. */
+(function(){
+const box=document.getElementById("suvBox"); if(!box) return;
+const DAY={
+  date:"2026-11-18", route:["LT","PL","DE"],
+  big:"6 000", bigUnit:"km", sub:"su Sharanu", sub2:"visi po 1 000 km",
+  laughs:["HAHAHAHA","CHA CHA CHA","PYP PYYYP!","KHE KHE KHE","VAROM TOLIAU!","HAHAHAHA!!!"],
+  // v: skaičius, u: vienetas, pre: ženklas prieš, t: parašas, e: kas išlekia paspaudus, f: faktas paspaudus (suskaičiuotas iš tų pačių skaičių)
+  stats:[
+    {ic:"sandwich",v:"14",t:"sumuštinių suvalgėm",e:"🥪",f:"≈ 2,3 sumuštinio kiekvienam"},
+    {ic:"fuel",v:"3 + 2",t:"degalinės: 3 Lenkijoje, 2 Vokietijoje",e:"⛽",f:"degalinė kas ~200 km"},
+    {ic:"flame",v:"140",u:"l",gap:6,t:"dujų sudeginom Sharaniukui",e:"🔥",f:"išeina 14 l / 100 km"},
+    {ic:"music",v:"37",t:"seniai pamiršti muzikiniai gabalai",e:"🎵",f:"naujas gabalas kas ~27 km"},
+    {ic:"chat",pre:"~",v:"76",t:"juodi bajeriukai su daug „hahahah“",e:"😂",f:"po bajeriuką kas ~13 km"},
+    {ic:"laugh",v:"12 000",u:"kcal",gap:8,t:"iškikenom – po ~2 000 kiekvienas",e:"🤣",f:"≈ 158 kcal vienam bajeriukui"},
+    {ic:"wc",v:"8",u:"×",us:48,gap:4,t:"buvom tualetuose",e:"🚽",f:"stojom kas ~125 km"},
+    {ic:"clock",v:"10",u:"min",gap:8,t:"kalbėjomės apie vaikus ir mokslus",e:"⏱️",f:"likusį laiką: hahaha"},
+  ]
+};
+const A="#F7C948", INK="#F4F1EA", MUT="#9FA7C6", NAVY="#0E1430", NS="http://www.w3.org/2000/svg";
+const FONT_URL="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700..800&family=Inter:wght@500..700&display=swap";
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const still=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const FLAGS={LT:["#FDB913","#006A44","#C1272D"],PL:["#FFFFFF","#DC143C"],DE:["#111111","#DD0000","#FFCE00"],
+  CZ:["#FFFFFF","#D7141A"],NL:["#AE1C28","#FFFFFF","#21468B"],AT:["#ED2939","#FFFFFF","#ED2939"],LV:["#9E3039","#FFFFFF","#9E3039"]};
+const IC={
+  arrow:`<path d="M4 12h16M14 6l6 6-6 6"/>`,
+  sandwich:`<path d="M3.5 19 12 5l8.5 14z"/><path d="M6.6 15c1.8-1.2 3.6-1.2 5.4 0s3.6 1.2 5.4 0"/>`,
+  fuel:`<path d="M4 20.5V5.5A1.5 1.5 0 0 1 5.5 4h6A1.5 1.5 0 0 1 13 5.5v15"/><path d="M2.5 20.5h12"/><path d="M6.5 7.5h4V11h-4z"/><path d="M13 10h1.5a2 2 0 0 1 2 2v4.5a1.5 1.5 0 0 0 3 0V8.5L17 6"/>`,
+  flame:`<path d="M12 3c.8 3.2 5.5 5.6 5.5 10.4a5.5 5.5 0 0 1-11 0c0-2.6 1.4-4.2 2.8-5.6.3 1.6 1 2.6 2.2 3C11.6 8.5 11.2 5.6 12 3z"/>`,
+  music:`<path d="M9 17.5V5.5l10-2v12"/><circle cx="6.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="15.5" r="2.5"/>`,
+  chat:`<path d="M4.5 4.5h15a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H10l-4.5 3.5v-3.5h-1a1 1 0 0 1-1-1v-10a1 1 0 0 1 1-1z"/><path d="M8.5 10.5c1.6 2 5.4 2 7 0"/>`,
+  laugh:`<circle cx="12" cy="12" r="8.75"/><path d="M8.2 9.6c.6-.8 1.6-.8 2.2 0M13.6 9.6c.6-.8 1.6-.8 2.2 0"/><path d="M7.8 13h8.4a4.2 4.2 0 0 1-8.4 0z"/>`,
+  wc:`<path d="M6 3.5h6V9H6z"/><path d="M4 9h14.5c0 3.4-2.4 6-5.6 6.5l.7 5H8.4l.6-5.1C6.1 14.7 4 12.3 4 9z"/>`,
+  clock:`<circle cx="12" cy="12" r="8.75"/><path d="M12 7.5V12l3 2"/>`
+};
+const CSS=`
+.suv text{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-weight:500}
+.suv .bf{font-family:'Bricolage Grotesque','Arial Black',system-ui,sans-serif;font-weight:800}
+.suv .lbl{font-size:19px;font-weight:700;letter-spacing:.18em;fill:${MUT}}
+.suv .date{font-size:19px;font-weight:700;letter-spacing:.02em;fill:${NAVY}}
+.suv .cc{font-size:19px;font-weight:700;fill:${INK}}
+.suv .h1{font-size:190px;letter-spacing:-.04em;fill:${A}}
+.suv .h1u{font-size:88px;letter-spacing:-.02em;fill:${INK}}
+.suv .sub{font-size:44px;font-weight:700;letter-spacing:-.01em;fill:${INK}}
+.suv .sub2{font-size:30px;fill:${MUT}}
+.suv .num{font-size:72px;letter-spacing:-.03em;fill:${INK}}
+.suv .unit{font-size:34px;font-weight:700;fill:${A}}
+.suv .cap{font-size:24px;fill:#C7CCE0}
+.suv .cap.fact{fill:${A};font-weight:700;animation:suvIn .3s ease-out}
+.suv .bub{font-size:28px;letter-spacing:.02em;fill:${NAVY}}
+.suv .ic{fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.suv .rail{fill:none;stroke:#7D86AC;stroke-width:5;stroke-linecap:round}
+.suv .seam{fill:none;stroke:rgba(0,0,0,.2);stroke-width:2.5;stroke-linecap:round}
+.suv .handle{fill:none;stroke:rgba(0,0,0,.35);stroke-width:4;stroke-linecap:round}
+.suv .glare{fill:none;stroke:rgba(255,255,255,.2);stroke-width:3;stroke-linecap:round}
+.suv .speed{fill:none;stroke:${INK};stroke-width:4;stroke-linecap:round;opacity:.35}
+.suv .spoke{fill:none;stroke:#8189AD;stroke-width:2.5;stroke-linecap:round}
+.suv .hit{fill:transparent;cursor:pointer}
+.suv [data-tap]{cursor:pointer;outline:none}
+.suv [data-tap]:focus-visible .hit{stroke:${A};stroke-width:3}
+.suv #suvBub:focus-visible path{stroke:${INK};stroke-width:3}
+.suv .dash{animation:suvDash .5s linear infinite}
+.suv .spin{animation:suvSpin 1s linear infinite}
+.suv .bob{animation:suvBob 1.1s ease-in-out infinite}
+.suv .speed{animation:suvSpeed .9s linear infinite}
+.suv .star{animation:suvTw 3.2s ease-in-out infinite}
+.suv .sway{animation:suvSway 3.4s ease-in-out infinite}
+.suv .honk .bob{animation:suvHop .55s ease-out}
+.suv .honk .beam{animation:suvFlash .55s ease-out}
+.suv .popit{animation:suvPop .42s cubic-bezier(.3,1.6,.5,1)}
+@keyframes suvDash{to{transform:translateX(-80px)}}
+@keyframes suvSpin{to{transform:rotate(360deg)}}
+@keyframes suvBob{50%{transform:translateY(-1.6px)}}
+@keyframes suvSpeed{0%{transform:translateX(24px);opacity:0}35%{opacity:.45}100%{transform:translateX(-28px);opacity:0}}
+@keyframes suvTw{50%{opacity:.12}}
+@keyframes suvSway{50%{transform:rotate(2.2deg) translateY(-2px)}}
+@keyframes suvHop{0%{transform:none}30%{transform:translateY(-15px)}58%{transform:none}76%{transform:translateY(-5px)}100%{transform:none}}
+@keyframes suvFlash{35%{opacity:.5}}
+@keyframes suvPop{0%{transform:scale(.45)}100%{transform:none}}
+@keyframes suvIn{from{opacity:0}}
+.suv.paused *{animation-play-state:paused!important}
+.suv.still *,.suv.col *{animation:none!important}
+@media (prefers-reduced-motion:reduce){.suv *{animation:none!important}}
+@media print{.suv *{animation:none!important}}
+.suv.col text,.suv.col tspan{fill:#1f2328}
+.suv.col .ln{stroke:#1f2328;opacity:1}
+.suv.col .rule{stroke:#c5c9d3}
+.suv.col .star,.suv.col .dk{fill:#1f2328;opacity:1}
+.suv.col .dash{opacity:1}
+.suv.col .fx,.suv.col .hit{display:none}
+.suv.col [data-tap]{cursor:default}
+.suv.col :not(.pt){pointer-events:none}
+.suv.col .pt{fill:var(--c,#fff);stroke:#1f2328;stroke-width:2.5px;stroke-linejoin:round;opacity:1;cursor:pointer;pointer-events:all}
+.suv.col .h1.pt{stroke-width:4px}
+.suv.col .dash .pt{stroke-width:1.5px}
+.suv.col .beam.pt{fill:var(--c,none);stroke-width:2px;stroke-dasharray:10 9}
+`;
+const ico=(n,x,y,size,c)=>`<g class="ic ln" transform="translate(${x} ${y}) scale(${(size/24).toFixed(4)})" stroke="${c}">${IC[n]||""}</g>`;
+function bubPath(w){ const l=-w/2, r=w/2, t=-29, b=21, R=20;
+  return `M${l+R} ${t}H${r-R}A${R} ${R} 0 0 1 ${r} ${t+R}V${b-R}A${R} ${R} 0 0 1 ${r-R} ${b}H${l+46.7}L${l+35} ${b+11.7}L${l+23.3} ${b}H${l+R}A${R} ${R} 0 0 1 ${l} ${b-R}V${t+R}A${R} ${R} 0 0 1 ${l+R} ${t}Z` }
+const wheel=x=>`<g transform="translate(${x} 140)"><circle class="pt" data-k="padangos" r="26" fill="#0A0C17"/><g class="spin"><circle class="pt" data-k="ratlankiai" r="13" fill="#A9B0CC"/><path class="spoke ln" d="M-11 0H11M0 -11V11"/></g><circle class="dk" r="5" fill="#0A0C17"/></g>`;
+
+function build(){
+  const d=DAY; let s=`<style>${CSS}</style><rect class="pt" data-k="dangus" width="1080" height="1350" fill="${NAVY}"/>`;
+  // mėnulis ir žvaigždės
+  s+=`<g transform="translate(800 118)"><path class="pt" data-k="menulis" d="M154 22 A30 30 0 1 0 186 64 A28 28 0 0 1 154 22 Z" fill="#F4E7C2" opacity=".92"/>`+
+    [[34,30,2.5,.75,0],[88,70,2,.55,.7],[62,128,2.5,.6,1.3],[204,118,2,.5,.4],[118,14,1.8,.6,1.9]].map(([x,y,r,o,dl])=>`<circle class="star" cx="${x}" cy="${y}" r="${r}" fill="${INK}" opacity="${o}" style="animation-delay:${dl}s"/>`).join("")+`</g>`;
+  // antraštė: data ir maršrutas
+  s+=`<text id="suvLbl" class="lbl" x="72" y="82.5">DIENOS SUVESTINĖ</text><rect id="suvPill" class="pt" data-k="data" x="327.8" y="57" width="139.6" height="38" rx="19" fill="${A}"/><text id="suvDate" class="date" x="397.6" y="82.5" text-anchor="middle">${esc(d.date)}</text>`;
+  const n=d.route.length; let x=1008-(n*70+(n-1)*46);
+  d.route.forEach((c,i)=>{ const st=FLAGS[c]||[MUT], h=26/st.length;
+    s+=`<clipPath id="suvF${i}"><rect x="${x}" y="63" width="38" height="26" rx="5"/></clipPath><g clip-path="url(#suvF${i})">`+
+      st.map((col,j)=>`<rect class="pt" data-k="v${i}${j}" x="${x}" y="${(63+j*h).toFixed(2)}" width="38" height="${h.toFixed(2)}" fill="${col}"/>`).join("")+
+      `</g><rect class="ln" x="${x}" y="63" width="38" height="26" rx="5" fill="none" stroke="rgba(244,241,234,.25)"/><text class="cc" x="${x+46}" y="82.5">${esc(c)}</text>`;
+    x+=70; if(i<n-1){ s+=ico("arrow",x+12,65,22,MUT); x+=46 } });
+  // didysis skaičius
+  s+=`<text data-tap="km" role="button" tabindex="0" aria-label="${esc(d.big+" "+d.bigUnit+" "+d.sub+", "+d.sub2)}" x="72" y="276"><tspan class="bf h1 pt cnt" data-k="km" data-v="${esc(d.big)}">${esc(d.big)}</tspan><tspan class="bf h1u pt" data-k="kmu" dx="18">${esc(d.bigUnit)}</tspan></text>`;
+  s+=`<text x="72" y="350.4"><tspan class="bf sub">${esc(d.sub)}</tspan><tspan class="sub2" dx="16">${esc(d.sub2)}</tspan></text>`;
+  // kelias
+  s+=`<rect class="pt" data-k="kelias" x="-4" y="508.4" width="1088" height="76" fill="#1A2148"/><g opacity=".85"><g class="dash">`;
+  for(let dx=-80;dx<1200;dx+=80) s+=`<rect class="pt" data-k="linija" x="${dx}" y="527.4" width="46" height="6" fill="${A}"/>`;
+  s+=`</g></g>`;
+  // Šaranas
+  s+=`<g id="suvScene" transform="translate(72 392.4)">
+<polygon class="beam pt" data-k="sviesa" points="506,102 840,40 840,176 506,114" fill="#FFF1C4" opacity=".07"/>
+<polygon class="beam fx" points="506,103 840,62 840,154 506,113" fill="#FFF1C4" opacity=".09"/>
+<polygon class="beam fx" points="506,104 840,84 840,132 506,111" fill="#FFF1C4" opacity=".13"/>
+<path class="speed ln" d="M8 58 H58 M0 88 H64 M16 118 H62"/>
+<g transform="translate(80 0)"><g data-tap="van" role="button" tabindex="0" aria-label="Šaranas. Paspausk, kad pyptelėtų">
+<ellipse class="fx" cx="219" cy="167" rx="214" ry="6" fill="rgba(0,0,0,.4)"/>
+<g class="bob">
+<path class="rail ln" d="M60 21 L262 16"/><path class="rail ln" d="M72 21 L72 27 M250 16 L250 23"/>
+<path class="pt" data-k="kebulas" d="M6 134 L6 62 Q6 30 36 28 L282 22 Q298 22 308 32 L352 82 L408 96 Q428 101 430 118 L432 132 Q432 140 424 140 L354 140 A32 32 0 0 0 290 140 L124 140 A32 32 0 0 0 60 140 L14 140 Q6 140 6 134 Z" fill="#EEF1F7"/>
+<path class="pt" data-k="langai" d="M22 46 Q22 39 30 39 L280 33 Q291 33 299 42 L337 86 L22 88 Z" fill="#1E2850"/>
+<path class="glare fx" d="M40 80 L70 48 M134 80 L164 46 M204 80 L232 48"/>
+<path class="pt" data-k="kebulas" d="M104 33 h11 v57 h-11 z M258 30 h10 v60 h-10 z" fill="#EEF1F7"/>
+<path class="pt" data-k="kebulas" d="M334 80 L351 77 L353 89 L338 91 Z" fill="#EEF1F7" stroke="rgba(0,0,0,.22)" stroke-width="2" stroke-linejoin="round"/>
+<path class="seam ln" d="M10 104 L428 112"/><path class="seam ln" d="M116 92 L116 116 M263 92 L263 138"/>
+<path class="handle ln" d="M130 100 h16 M276 100 h16"/>
+<path class="fx" d="M124 130 L290 130 L290 140 L124 140 Z" fill="rgba(0,0,0,.16)"/>
+<path class="seam ln" d="M404 126 L431 126"/>
+<path class="pt" data-k="zibintas" d="M410 100 L428 104 Q431 110 429 113 L413 110 Z" fill="#FFF1C4"/>
+<rect class="pt" data-k="stopas" x="6" y="56" width="7" height="32" rx="2" fill="#FF5A4E"/>
+${wheel(92)}${wheel(322)}
+</g>
+<rect class="hit" x="-6" y="6" width="450" height="170" rx="14"/>
+</g></g></g>`;
+  // juoko burbulas
+  s+=`<g transform="translate(722.75 409.4) rotate(-5)"><g class="sway"><g id="suvBub" data-tap="van" role="button" tabindex="0" aria-label="Juoko burbulas"><path id="suvBubP" class="pt" data-k="burbulas" fill="${A}" d="${bubPath(205.5)}"/><text id="suvBubT" class="bf bub" x="0" y="4.2" text-anchor="middle">${esc(d.laughs[0])}</text></g></g></g>`;
+  // dienos skaičiai
+  d.stats.forEach((t,i)=>{ const tx=i%2?568:72, ty=+(606.4+172.9*(i>>1)).toFixed(1);
+    s+=`<g data-tap="t${i}" role="button" tabindex="0" aria-label="${esc((t.pre||"")+t.v+(t.u?" "+t.u:"")+" "+t.t)}">
+<line class="rule" x1="${tx}" y1="${ty+.5}" x2="${tx+440}" y2="${ty+.5}" stroke="rgba(244,241,234,.16)"/>${ico(t.ic,tx,ty+34,46,A)}
+<text x="${tx+64}" y="${ty+81}">${t.pre?`<tspan class="bf unit" style="font-size:52px">${esc(t.pre)}</tspan>`:""}<tspan class="bf num pt cnt" data-k="n${i}" data-v="${esc(t.v)}"${t.pre?' dx="4"':""}>${esc(t.v)}</tspan>${t.u?`<tspan class="bf unit" dx="${t.gap||6}"${t.us?` style="font-size:${t.us}px"`:""}>${esc(t.u)}</tspan>`:""}</text>
+<text class="cap" x="${tx}" y="${ty+127}">${esc(t.t)}</text>
+<rect class="hit" x="${tx-10}" y="${ty+6}" width="460" height="162" rx="12"/></g>`; });
+  return `<svg xmlns="${NS}" id="suvSvg" class="suv" viewBox="0 0 1080 1350" role="group" aria-label="Šarano dienos suvestinė, ${esc(d.date)}">${s}</svg>`;
+}
+box.insertAdjacentHTML("afterbegin",build());
+const $=id=>document.getElementById(id);
+const sec=$("suv"), svg=$("suvSvg"), fx=$("suvFx"), scene=$("suvScene"), bub=$("suvBub");
+$("suvFootDate").textContent=DAY.date; if(location.host) $("suvFootHost").textContent=location.host;
+
+/* --- išdėstymas pagal tikrą šrifto plotį --- */
+function setBubble(txt){ const t=$("suvBubT"); t.textContent=txt; const len=t.getComputedTextLength(); if(len>10) $("suvBubP").setAttribute("d",bubPath(Math.round(len+40))) }
+function fit(){ const L=$("suvLbl").getComputedTextLength(); if(L<50) return;
+  const px=72+L+16; $("suvPill").setAttribute("x",px.toFixed(1)); $("suvDate").setAttribute("x",(px+69.8).toFixed(1)); setBubble($("suvBubT").textContent) }
+fit(); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fit);
+
+/* --- skaičių suskaičiavimas nuo nulio --- */
+const NUM=/\d+(?:[  ]\d{3})*/g;
+function count(el,dur){ const v=el.dataset.v; if(still){ el.textContent=v; return }
+  cancelAnimationFrame(el._raf); const t0=performance.now(); dur=dur||1100;
+  (function step(now){ const p=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-p,3);
+    el.textContent=v.replace(NUM,m=>{ const n=Math.round(parseInt(m.replace(/\D/g,""),10)*e); return /\D/.test(m)?String(n).replace(/\B(?=(\d{3})+$)/g," "):String(n) });
+    if(p<1) el._raf=requestAnimationFrame(step); else el.textContent=v })(t0) }
+const countAll=()=>svg.querySelectorAll(".cnt").forEach((el,i)=>setTimeout(()=>count(el,1300),i*70));
+
+/* --- išlekiantys jaustukai --- */
+function burst(ux,uy,em,n){ if(still) return; const k=box.clientWidth/1080;
+  for(let i=0;i<(n||7);i++){ const e=document.createElement("span"), a=-Math.PI/2+(Math.random()-.5)*2.4, d=(170+Math.random()*170)*k;
+    e.className="suv-em"; e.textContent=em; e.style.left=ux*k+"px"; e.style.top=uy*k+"px"; e.style.fontSize=Math.max(16,54*k)+"px"; e.style.animationDelay=i*40+"ms";
+    e.style.setProperty("--dx",Math.cos(a)*d+"px"); e.style.setProperty("--dy",Math.sin(a)*d+"px"); e.style.setProperty("--r",(Math.random()*90-45)+"deg");
+    e.addEventListener("animationend",()=>e.remove()); fx.appendChild(e) } }
+function replay(el,cls,ms){ el.classList.remove(cls); el.getBoundingClientRect(); el.classList.add(cls); clearTimeout(el["_"+cls]); el["_"+cls]=setTimeout(()=>el.classList.remove(cls),ms) }
+
+/* --- paspaudimai --- */
+let laugh=0;
+function honk(){ laugh=(laugh+1)%DAY.laughs.length; setBubble(DAY.laughs[laugh]); replay(scene,"honk",600); replay(bub,"popit",450); burst(722,400,"😂",5) }
+function tapTile(i){ const t=DAY.stats[i], g=svg.querySelector(`[data-tap="t${i}"]`), cap=g.querySelector(".cap");
+  g.querySelectorAll(".cnt").forEach(el=>count(el,900)); burst((i%2?568:72)+23,606.4+172.9*(i>>1)+57,t.e,7);
+  if(t.f){ cap.classList.remove("fact"); cap.getBoundingClientRect(); cap.textContent=t.f; cap.classList.add("fact"); clearTimeout(cap._t); cap._t=setTimeout(()=>{cap.textContent=t.t;cap.classList.remove("fact")},3800) } }
+function act(k){ if(k==="van") honk(); else if(k==="km"){ svg.querySelectorAll('[data-tap="km"] .cnt').forEach(el=>count(el,1500)); burst(300,200,"💨",6) } else tapTile(+k.slice(1)) }
+svg.addEventListener("click",e=>{ if(col) return paintAt(e.target); const g=e.target.closest("[data-tap]"); if(g) act(g.dataset.tap) });
+svg.addEventListener("keydown",e=>{ if(col||(e.key!=="Enter"&&e.key!==" ")) return; const g=e.target.closest("[data-tap]"); if(g){ e.preventDefault(); act(g.dataset.tap) } });
+
+/* --- animacija tik kai plakatas matomas; pirmą kartą pasirodžius suskaičiuojam --- */
+let seen=false;
+if("IntersectionObserver" in window) new IntersectionObserver(es=>es.forEach(en=>{ svg.classList.toggle("paused",!en.isIntersecting);
+  if(en.isIntersecting){ fit(); if(!seen&&en.intersectionRatio>=.3){ seen=true; countAll() } } }),{threshold:[0,.3]}).observe(box);
+
+/* --- spalvinimo režimas --- */
+const PAL=[["#F7C948","Geltona"],["#FF9A5C","Oranžinė"],["#E03131","Raudona"],["#F06595","Rožinė"],["#7048E8","Violetinė"],["#3E6FD8","Mėlyna"],["#4DABF7","Žydra"],["#2F9E44","Žalia"],["#8D5A3B","Ruda"],["#868E96","Pilka"],["#1F2328","Juoda"],["#FFFFFF","Trintukas"]];
+const PKEY="sharan-spalvos-"+DAY.date;
+let col=false, cur=PAL[0][0], paint={};
+try{ paint=JSON.parse(localStorage.getItem(PKEY)||"{}")||{} }catch(e){}
+function applyPaint(){ svg.querySelectorAll(".pt").forEach(el=>{ const c=paint[el.dataset.k]; if(c) el.style.setProperty("--c",c); else el.style.removeProperty("--c") }) }
+function savePaint(){ try{ localStorage.setItem(PKEY,JSON.stringify(paint)) }catch(e){} }
+function paintAt(target){ const el=target.closest(".pt"); if(!el) return; const k=el.dataset.k;
+  if(cur==="#FFFFFF") delete paint[k]; else paint[k]=cur; savePaint(); applyPaint() }
+const pal=$("suvPal");
+pal.innerHTML=PAL.map(([c,nm],i)=>`<button type="button" class="sw${i?"":" on"}" style="--sw:${c}" data-c="${c}" title="${nm}" aria-label="${nm}"></button>`).join("")+`<button type="button" class="ghost" id="suvClear">Išvalyti</button>`;
+pal.addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return;
+  if(b.id==="suvClear"){ paint={}; savePaint(); applyPaint(); return }
+  cur=b.dataset.c; pal.querySelectorAll(".sw").forEach(x=>x.classList.toggle("on",x===b)) });
+$("suvCol").onclick=()=>{ col=!col; svg.classList.toggle("col",col); sec.classList.toggle("col",col); pal.hidden=!col;
+  svg.querySelectorAll(".cap").forEach((c,i)=>{ clearTimeout(c._t); c.classList.remove("fact"); c.textContent=DAY.stats[i].t });
+  $("suvCol").textContent=col?"🌙 Grįžti į naktį":"🖍️ Spalvinti";
+  $("suvHint").textContent=col?"🖍️ Pasirink spalvą ir spausk ant Šarano, skaičių ar dangaus. Arba spausdink ir spalvink flomasteriais.":"👆 Paspausk Šaraną, burbulą ar skaičius" };
+applyPaint();
+
+/* --- spausdinimas: tik plakatas, A4 --- */
+// klasė nuimama tik po kito prisilietimo: telefonuose print() grįžta iškart, o lapas piešiamas vėliau
+$("suvPrint").onclick=()=>{ const h=document.documentElement, off=()=>h.classList.remove("suv-print");
+  h.classList.add("suv-print"); setTimeout(()=>addEventListener("pointerdown",off,{once:true,capture:true}),800); window.print() };
+
+/* --- paveikslėlis (PNG 2160x2700) dalinimuisi --- */
+let fontP=null;
+function fontCss(){ return fontP||(fontP=(async()=>{ const css=await (await fetch(FONT_URL)).text(); let out="";
+  for(const m of css.matchAll(/\/\*\s*([\w-]+)\s*\*\/\s*(@font-face\s*\{[^}]*\})/g)){ if(m[1]!=="latin"&&m[1]!=="latin-ext") continue;
+    const u=m[2].match(/url\((https:[^)]+)\)/); if(!u) continue; const b=await (await fetch(u[1])).blob();
+    out+=m[2].replace(u[1],await new Promise((ok,no)=>{ const r=new FileReader(); r.onload=()=>ok(r.result); r.onerror=no; r.readAsDataURL(b) })) }
+  return out })().catch(e=>{ fontP=null; return "" })) }
+async function png(){ const c=svg.cloneNode(true); c.setAttribute("width","1080"); c.setAttribute("height","1350"); c.classList.add("still"); c.classList.remove("paused");
+  c.querySelectorAll(".honk,.popit").forEach(e=>e.classList.remove("honk","popit"));
+  const st=document.createElementNS(NS,"style"); st.textContent=await fontCss(); c.insertBefore(st,c.firstChild);
+  const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(c)],{type:"image/svg+xml;charset=utf-8"}));
+  try{ const img=new Image(); await new Promise((ok,no)=>{ img.onload=ok; img.onerror=no; img.src=url }); await new Promise(r=>setTimeout(r,150));
+    const cv=document.createElement("canvas"); cv.width=2160; cv.height=2700; cv.getContext("2d").drawImage(img,0,0,2160,2700);
+    return await new Promise((ok,no)=>cv.toBlob(b=>b?ok(b):no(new Error("png")),"image/png")) }
+  finally{ URL.revokeObjectURL(url) } }
+const modal=$("suvModal"); let imgUrl=null, file=null;
+const closeModal=()=>{ modal.classList.remove("open"); document.body.classList.remove("modal-open") };
+$("suvShare").onclick=async()=>{ const b=$("suvShare"), old=b.textContent; b.disabled=true; b.textContent="⏳ Ruošiu…";
+  let blob=null; try{ blob=await png() }catch(e){}
+  b.disabled=false; b.textContent=old;
+  const name="sarano-suvestine-"+DAY.date+".png", src=blob?URL.createObjectURL(blob):"suvestine-"+DAY.date+".png";
+  if(imgUrl) URL.revokeObjectURL(imgUrl); imgUrl=blob?src:null;
+  $("suvImg").src=src; $("suvDl").href=src; $("suvDl").download=name;
+  file=null; try{ if(blob) file=new File([blob],name,{type:"image/png"}) }catch(e){}
+  $("suvDoShare").hidden=!(file&&navigator.canShare&&navigator.canShare({files:[file]}));
+  modal.classList.add("open"); document.body.classList.add("modal-open") };
+$("suvDoShare").onclick=()=>{ if(file) navigator.share({files:[file],title:"Šarano dienos suvestinė"}).catch(()=>{}) };
+$("suvClose").onclick=closeModal;
+modal.addEventListener("click",e=>{ if(e.target===modal) closeModal() });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&modal.classList.contains("open")) closeModal() });
+})();
 </script>
 </body>
 </html>

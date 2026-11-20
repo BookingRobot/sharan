@@ -456,11 +456,14 @@ function cancel(){ const old=[...tweens]; tweens.clear(); old.forEach(w=>w.no(CA
 /* ---------- pagalbininkai ---------- */
 const CAMV=[352,905,1.42], CAMB=[862,935,1.42], CAMS=[950,930,1.18], CAMW=[540,800,1];
 const STX=1302, STY=912;                                                // Thūlės vieta prie degalinės tualeto durų
-const hasSt=i=>i>0&&i<N&&(i%3===2||STOPS[i].prop==="lpgYes");            // kur matosi degalinė
-const wcGo=i=>hasSt(i)&&STOPS.slice(0,i+1).filter((_,j)=>hasSt(j)).length%2===0;   // Thūlė į tualetą eina kas antroje degalinėje
+const hasSt=i=>i>0&&i<N&&i%2===0;                                        // kas antras sustojimas: visi varom į degalinę
+const wcGo=i=>hasSt(i)&&i%4===0;                                         // Thūlė savo reikalui eina kas antroje degalinėje
+let tul=new Set();                                                       // kuriose degalinėse šį kartą vietoje krūmų visi myža į bendrą tualetą
+function pickTul(){ const f=new URLSearchParams(location.search).get("tulikas"), all=STOPS.map((_,i)=>i).filter(hasSt);   // ?tulikas=1 visada, ?tulikas=0 niekada (testams)
+  tul=new Set(f==="1"?all:f==="0"?[]:all.sort(()=>Math.random()-.5).slice(0,2)) }
 const stCount=i=>STOPS.slice(0,i).filter((_,j)=>wcGo(j)).length;
 const stDoor=open=>{ $("kStOpen").style.display=open?"":"none" };
-function stBusy(on){ inWc=on; $("kStBusy").setAttribute("fill",on?"#e03131":"#2f9e44"); $("kStBusyT").textContent=on?"UŽIMTA":"LAISVA" }
+function stBusy(on,txt){ inWc=on; $("kStBusy").setAttribute("fill",on?"#e03131":"#2f9e44"); const t=$("kStBusyT"); t.textContent=txt||(on?"UŽIMTA":"LAISVA"); t.setAttribute("font-size",txt?16:19) }
 let cam={x:540,y:800,z:1};
 function setCam(x,y,z){ cam={x,y,z}; const t=`translate(${(540-x*z).toFixed(1)} ${(800-y*z).toFixed(1)}) scale(${z.toFixed(3)})`; $("kCam").setAttribute("transform",t); $("kCam2").setAttribute("transform",t) }
 const camTo=(c,dur)=>{ const o=cam; return tw(dur,e=>setCam(o.x+(c[0]-o.x)*e,o.y+(c[1]-o.y)*e,o.z+(c[2]-o.z)*e)) };
@@ -473,7 +476,8 @@ const show=(a,on)=>{ a.el.style.display=on?"":"none" };
 const headIn=(p,on)=>{ const h=svg.querySelector(`.kh[data-p="${p}"]`); if(h) h.style.display=on?"":"none" };
 function setVan(x,tilt,dy){ van._x=x; van.setAttribute("transform",`translate(${x.toFixed(1)} ${VY}) scale(${VS})`); vanB.setAttribute("transform",`translate(0 ${(dy||0).toFixed(1)}) rotate(${(tilt||0).toFixed(2)} 322 166)`) }
 const door=o=>$("kDoor").setAttribute("opacity",o);
-function setPud(k){ $("kPudG").setAttribute("transform",`translate(880 1124) scale(${k.toFixed(3)})`); $("kTr").setAttribute("opacity",Math.min(1,k*3).toFixed(2)) }
+let PUD=[880,1124];
+function setPud(k){ $("kPudG").setAttribute("transform",`translate(${PUD[0]} ${PUD[1]}) scale(${k.toFixed(3)})`); $("kTr").setAttribute("opacity",PUD[0]===880?Math.min(1,k*3).toFixed(2):0) }
 const VW={map:mapG,scene:sceneG,bar:barG,flash:$("kFlash"),band:$("kBandG")};
 function setView(v){ view=v; for(const k in VW) VW[k].style.display=k===v?"":"none"; bubL.innerHTML=""; haL.innerHTML=""; capEl.classList.toggle("big",v==="bar"||v==="flash"||v==="band") }
 async function cut(v){ if(view===v) return; await tw(170,e=>fade.setAttribute("opacity",e.toFixed(2)),E.lin); setView(v); await tw(210,e=>fade.setAttribute("opacity",(1-e).toFixed(2)),E.lin) }
@@ -519,7 +523,7 @@ function prep(i){ const s=STOPS[i], k=SKY[s.sky];
   const o=$("kOrb"); o.setAttribute("cx",k[6][0]); o.setAttribute("cy",k[6][1]); o.setAttribute("r",k[6][2]); o.setAttribute("fill",k[6][3]);
   $("kLand").innerHTML=LAND[s.id]||""; $("kProps").innerHTML=PROP[s.prop]||""; $("kHose").style.display="none";
   $("kCity").textContent=s.n.toUpperCase(); $("kCSub").textContent=`${s.land} · ${i?"~"+s.km+" km":"startas"} · sustojimas ${i+1} iš ${N}`;
-  pssL.innerHTML=""; $("kButts").innerHTML=""; { const b=AC["Modė"].inn.querySelector(".kbot"); if(b) b.remove() } setPud(0); door(0); van.classList.remove("kroll"); setCam(...CAMW);
+  pssL.innerHTML=""; $("kButts").innerHTML=""; { const b=AC["Modė"].inn.querySelector(".kbot"); if(b) b.remove() } PUD=[880,1124]; setPud(0); door(0); van.classList.remove("kroll"); setCam(...CAMW);
   $("kStation").style.display=hasSt(i)?"":"none"; $("kStB").removeAttribute("transform"); $("kStWin").setAttribute("fill",s.sky>=4?"#ffe59a":"#a5d8ff"); stDoor(false); stBusy(false);
   CREW.forEach(p=>{ const a=AC[p]; $("kAct").appendChild(a.el); show(a,false); rock(a,0,0); headIn(p,true); setPos(a,0,0,CS) });
   $("kGl").appendChild(G.el); show(G,true); setVan(-680,0,0); setPos(G,-680+GX,GY,1.25);
@@ -534,10 +538,17 @@ async function arrive(){ van.classList.add("kroll");
 async function exitAll(ord){ door(1); bg(camTo(CAMV,650));
   await Promise.all(ord.map((p,k)=>wait(k*170).then(async()=>{ const a=AC[p]; headIn(p,false); setPos(a,DOORX,DOORY,.75); show(a,true);
     await hop(a,SPOT[k][0],SPOT[k][1],78,430,CS); await tw(160,(e,q)=>rock(a,0,Math.sin(q*Math.PI)*7),E.lin); rock(a,0,0) }))) }
-async function toWc(a){ $("kFront").appendChild(a.el); bg(say(a,rnd(["Aš į degalinę!","Man rimtesnis reikalas","Kur čia WC? KIJA!"]),1100));
-  await walk(a,690,1018,560); await walk(a,1140,1004,480); await walk(a,STX,STY,300);
-  stDoor(true); await tw(240,e=>setPos(a,STX,STY-8*e,CS*(1-.2*e))); show(a,false); setPos(a,STX,STY,CS); stDoor(false); stBusy(true) }
-async function fromWc(a,k){ stBusy(false); stDoor(true); setPos(a,STX,STY-8,CS*.8); show(a,true); await tw(220,e=>setPos(a,STX,STY-8+8*e,CS*(.8+.2*e))); stDoor(false);
+const GP=k=>k<3?[1150+k*82,950]:[1188+(k-3)*82,1004];                    // kur kas sustoja prie degalinės
+async function inDoor(a,ms){ await walk(a,STX,STY,ms||300); stDoor(true); await tw(200,e=>setPos(a,STX,STY-8*e,CS*(1-.2*e))); show(a,false); setPos(a,STX,STY,CS); stDoor(false) }
+async function outDoor(a){ stDoor(true); setPos(a,STX,STY-8,CS*.8); show(a,true); await tw(200,e=>setPos(a,STX,STY-8+8*e,CS*(.8+.2*e))); stDoor(false) }
+async function toStation(ord){ bg(floatTo(G,1030,650,1300)); bg(camTo(CAMS,1250));          // kas antras sustojimas: visi varom į degalinę
+  bg(say(AC[ord[0]],rnd(["Visi į degalinę!","Varom į degalinę!","Degalinė! Paskui mane!"]),1200));
+  await Promise.all(ord.map((p,k)=>wait(k*110).then(async()=>{ const a=AC[p]; $("kFront").appendChild(a.el); await walk(a,690,1018,500); await walk(a,...GP(k),640) }))) }
+async function shop(ord){ bg(say(AC[ord[1]],rnd(["Šešis dešrainius!","Kavos visiems!","Traškučių ir alaus!","Ar turit šaltibarščių?"]),1300));
+  bg(wait(750).then(()=>say(AC[ord[4]],rnd(["Čekio nereikia","Brangiau nei Lietuvoj","Ir popieriaus Thūlei"]),1150)));
+  await Promise.all(ord.map((p,k)=>wait(250+k*170).then(()=>floaty(AC[p].x,AC[p].y-120,rnd(["🌭","☕","🍫","🥨","🍦","🥤"]),-80,900)))); await wait(250) }
+async function toWc(a){ $("kFront").appendChild(a.el); bg(say(a,rnd(["Aš į tualetą!","Man rimtesnis reikalas","Kur čia WC? KIJA!"]),1100)); await inDoor(a,380); stBusy(true) }
+async function fromWc(a,k){ stBusy(false); await outDoor(a);
   bg(say(a,rnd(["Palengvėjo. KIJA!","Kaip naujas!","Degalinė užskaityta"]),1200));
   await walk(a,1140,1004,300); await walk(a,690,1018,500); await walk(a,SPOT[k][0],SPOT[k][1],480); $("kAct").appendChild(a.el) }
 async function wcShow(){ const B=$("kStB"), w=rnd(WCW);
@@ -545,9 +556,10 @@ async function wcShow(){ const B=$("kStB"), w=rnd(WCW);
   [0,1,2,3].forEach(k=>bg(wait(250+k*380).then(()=>floaty(STX-150+k*62,STY-240,w[k],-100,1000))));
   await tw(1800,(e,p)=>B.setAttribute("transform",`translate(${(Math.sin(p*46)*4).toFixed(1)} 0) rotate(${(Math.sin(p*33)*1.1).toFixed(2)})`),E.lin); B.removeAttribute("transform");
   wcs++; hud(); fxBurst(STX-40,STY-120,"🧻",4) }
-async function toBush(ord,st,wc){ bg(floatTo(G,884,700,1200)); bg(camTo(st?CAMS:CAMB,1250));
-  if(st&&!wc) bg(wait(1400).then(()=>say(AC["Thūlė"],rnd(["Šitą degalinę praleidžiu","Eisiu kitoje degalinėje","Dar pakentėsiu. KIJA!"]),1300)));
-  await Promise.all(ord.map((p,k)=>wait(k*90).then(()=>wc&&p==="Thūlė"?toWc(AC[p]):walk(AC[p],BX[5-k],BYY+(k%2)*8,1050+k*40)))) }
+async function toBush(ord,st,wc){ bg(floatTo(G,884,700,1200)); if(!st) bg(camTo(CAMB,1250));
+  if(st&&!wc) bg(wait(900).then(()=>say(AC["Thūlė"],rnd(["Šitą degalinę praleidžiu","Eisiu kitoje degalinėje","Dar pakentėsiu. KIJA!"]),1300)));
+  await Promise.all(ord.map((p,k)=>wait(k*90).then(()=>{ const a=AC[p]; if(wc&&p==="Thūlė") return toWc(a);
+    if(st) $("kAct").appendChild(a.el); return walk(a,BX[5-k],BYY+(k%2)*8,1050+k*40) }))) }
 async function pee(i,s,st){ const size=.5+.05*i, words=s.notes?["♪","♫","la-laaa","♪"]:rnd(PEEW);
   const fl=[0,1,2,3].map(k=>wait(k*260).then(()=>floaty(740+k*88,s.notes?930:1010,words[k],s.notes?-170:-120,1300)));
   bg(wait(500).then(()=>say(G,s.sky>=5?"Aš jums pašviesiu, uuuu…":rnd(["Man nereikia. Aš dvasia.","Aš palauksiu čia, uuuu…","Dvasios krūmų nelanko"]),1500)));
@@ -556,6 +568,26 @@ async function pee(i,s,st){ const size=.5+.05*i, words=s.notes?["♪","♫","la-
   puddles++; hud(); fxBurst(880,1090,"💧",5) }
 async function fromBush(ord,st){ bg(floatTo(G,VX+GX,GY,1100)); bg(wait(st?520:0).then(()=>camTo(CAMV,1100)));
   await Promise.all(ord.map((p,k)=>st&&p==="Thūlė"?fromWc(AC[p],k):wait((5-k)*70).then(()=>walk(AC[p],SPOT[k][0],SPOT[k][1],900+k*30)))) }
+const TULC=["Šį kartą be krūmų: visi šeši varom į vieną bendrą degalinės tualetą.","Krūmai šį kartą ilsisi. Visi šeši į bendrą tualetą: ankšta, bet draugiška."];
+async function tulikas(i,s,ord,wc){ const B=$("kStB"), size=(.5+.05*i)*.6, words=s.notes?["♪","♫","la-laaa","♪"]:rnd(PEEW);
+  cap(rnd(TULC)); await toStation(ord);
+  bg(say(AC[ord[5]],rnd(["Visi į vieną. Taupom laiką!","Kultūringai. Kaip Europoj.","Bendras tulikas!"]),1200));
+  for(const p of ord) await inDoor(AC[p],170);
+  stBusy(true,"UŽIMTA ×6"); PUD=[1290,1052];
+  bg(wait(200).then(()=>sayAt(STX-30,STY-170,rnd(["Ankšta!","Nestumdyk!","Kieno čia alkūnė?"]),1000)));
+  bg(wait(1350).then(()=>sayAt(STX-30,STY-170,rnd(["Pasislink!","Ne ant bato!","Taikyk į vidurį!"]),950)));
+  bg(wait(500).then(()=>say(G,rnd(["Man nereikia. Aš dvasia.","Aš ir taip netilpčiau, uuuu…","Kiaurai sieną viską matau. Be reikalo."]),1500)));
+  const fl=[0,1,2,3].map(k=>wait(k*300).then(()=>floaty(STX-190+k*84,STY-250,words[k],-110,1300)));
+  await Promise.all([tw(2300,(e,p)=>{ B.setAttribute("transform",`translate(${(Math.sin(p*52)*4).toFixed(1)} 0) rotate(${Math.sin(p*37).toFixed(2)})`); setPud(size*Math.max(0,(p-.25)/.75)) },E.lin),...fl]);
+  B.removeAttribute("transform"); puddles++; hud(); fxBurst(PUD[0],PUD[1]-30,"💧",5);
+  cap("Bala vis tiek atsirado: išbėgo pro tualeto duris. Varom!");
+  const back=[]; bg(floatTo(G,VX+GX,GY,1500));
+  for(let k=5;k>=0;k--){ const p=ord[k], a=AC[p]; if(wc&&p==="Thūlė") continue; await outDoor(a);
+    const q=walk(a,1140,1004,260).then(()=>walk(a,690,1018,520)).then(()=>walk(a,SPOT[k][0],SPOT[k][1],460)).then(()=>{ $("kAct").appendChild(a.el) }); bg(q); back.push(q) }
+  if(wc){ stBusy(true); bg(sayAt(STX-30,STY-170,"Aš dar pabūsiu. Rimtas reikalas!",1300)); await wait(450); await wcShow();
+    const q=fromWc(AC["Thūlė"],ord.indexOf("Thūlė")); bg(q); back.push(q) }
+  else stBusy(false);
+  bg(wait(350).then(()=>camTo(CAMV,1100))); await Promise.all(back) }
 async function enterAll(ord){ door(1);
   await Promise.all(ord.map((p,k)=>wait((5-k)*150).then(async()=>{ const a=AC[p]; await hop(a,DOORX,DOORY,70,330,.75); show(a,false); headIn(p,true) })));
   door(0) }
@@ -602,6 +634,7 @@ function laugh(){ if(mute||view==="flash"||view==="band") return;
   const world=view==="scene", out=CREW.filter(p=>AC[p].el.style.display!=="none");
   const tx=ha3();
   if(out.length){ out.forEach(p=>anim(AC[p].w,"klol")); pick3(out).forEach((p,k)=>{ const a=AC[p]; bg(wait(k*50).then(()=>haha(a.x,a.y-54*a.s,world,tx[k],k))) }) }
+  else if(world&&inWc){ tx.forEach((t,k)=>bg(wait(k*50).then(()=>haha(STX-70+k*60,STY-120,true,t,k)))) }
   else if(world){ anim(vanH,"klol"); pick3(CREW).forEach((p,k)=>bg(wait(k*50).then(()=>haha((van._x||0)+SEAT[p]*VS,VY+34,true,tx[k],k)))) }
   if(Math.random()<.3) bg(wait(380).then(()=>haha(G.x,G.y-72*G.s,world,rnd(["hu hu huuu…","uhuhuuu!","bū-cha-cha!"])))) }
 async function laughLoop(){ try{ await wait(900); for(;;){ laugh(); await wait(2100+Math.random()*1300) } }catch(e){} }
@@ -659,6 +692,7 @@ function extra(o){ lastX=rnd(["tyre","tyre","tyre","box","selfie","karate","squa
 const CRIT=[["🦆","kre kre"],["🐇","šmurkšt"],["🐈","miau"],["🐄","mūūū"],["🦔","pūkšt"],["🐕","au au"],["🐓","kakarieku"],["🦉","ū-hū",1]];
 const PEEW=[["pššš","čiurrr","pšššš","aaach"],["čiurrr","pšššt","oi gerai","ufff"],["pššššš","pagaliau","čiur čiur","aaach"]];
 const WCW=[["prrrt","pliumpt","ufff…","💩"],["pliumpt","oi…","prrrrt","💩"],["ufff…","prrt","pliumpt pliumpt","💩"]];
+const STC=["Kas antras sustojimas yra degalinė. Visi varom vidun!","Degalinė! Visi varom: dešrainiai, kava ir traškučiai."];
 async function stopScene(i){ const s=STOPS[i], ord=order(i), st=hasSt(i), wc=wcGo(i); prep(i); await cut("scene"); cap(s.cap[0]);
   await arrive(); await wait(350); await exitAll(ord);
   if(s.lpg){ lpg++; hud() }
@@ -668,8 +702,10 @@ async function stopScene(i){ const s=STOPS[i], ord=order(i), st=hasSt(i), wc=wcG
   if(TW[s.id]) await TW[s.id](ord);
   if(!first) await extra(ord);
   await sm;
-  cap(s.cap[1]); await toBush(ord,st,wc); await pee(i,s,wc);
-  cap(s.cap[2]); await wait(600); await fromBush(ord,wc);
+  if(st&&tul.has(i)) await tulikas(i,s,ord,wc);                           // kartais vietoje krūmų: visi į bendrą tualetą
+  else{ if(st){ cap(rnd(STC)); await toStation(ord); await shop(ord) }
+    cap(s.cap[1]); await toBush(ord,st,wc); await pee(i,s,wc);
+    cap(s.cap[2]); await wait(600); await fromBush(ord,wc) }
   if(i===N-1){ hopAll(); fxBurst(330,880,"🍻",8); await wait(1300); return }
   await enterAll(ord); await leave() }
 async function startScene(){ const s=STOPS[0], ord=order(0); prep(0); setVan(VX,0,0);
@@ -764,7 +800,7 @@ async function main(from){ bg(laughLoop()); try{
     if(from<=N){ stage=N; puddles=N-1; cigs=3*(N-1); wcs=stCount(N); lpg=3; mapState(N,TOTAL); await barScene() }
     endCard();
   }catch(e){ if(e!==CANCEL) console.error(e) } }
-function go(i){ cancel(); if(!i||!started) ro=Math.floor(Math.random()*6); started=true; cover.hidden=true; fade.setAttribute("opacity",0); flashEl.setAttribute("opacity",0); mute=false; sad(false); $("kPhoto").style.display="none"; bubL.innerHTML=""; pssL.innerHTML=""; haL.innerHTML=""; fxEl.innerHTML=""; playing=true; ui(); kick(); main(i) }
+function go(i){ cancel(); if(!i||!started){ ro=Math.floor(Math.random()*6); pickTul() } started=true; cover.hidden=true; fade.setAttribute("opacity",0); flashEl.setAttribute("opacity",0); mute=false; sad(false); $("kPhoto").style.display="none"; bubL.innerHTML=""; pssL.innerHTML=""; haL.innerHTML=""; fxEl.innerHTML=""; playing=true; ui(); kick(); main(i) }
 function ui(){ $("kinoPlay").textContent=!started||stage>N?"▶ Paleisti":playing?"⏸ Pauzė":"▶ Tęsti" }
 
 /* ---------- bakstelėjimai ---------- */
@@ -779,7 +815,7 @@ svg.addEventListener("click",e=>{ const t=e.target; let g;
   if(g=t.closest(".ka")) return poke(g.dataset.p===GHOST?G:AC[g.dataset.p]||XT[g.dataset.p]);
   if(t.closest("#kMeat")) return bite();
   if(g=t.closest(".kmug")){ fxBurst(MUGX[+g.dataset.i],940,"🍺",3); return }
-  if(t.closest("#kPudG")){ fxBurst(880,1110,"💦",6); return }
+  if(t.closest("#kPudG")){ fxBurst(PUD[0],PUD[1]-14,"💦",6); return }
   if(t.closest("#kStation")){ const b=bubble(STX-30,STY-170,inWc?rnd(["Užimta!","Tuoj, tuoj!","Popieriaus yra?"]):"Laisva. Thūlė jau buvo?"); setTimeout(()=>b.remove(),1100); return }
   if(t.closest("#kVan")) return honk() });
 cover.addEventListener("click",e=>{ if(e.target.closest("#kinoStart")) go(0) });

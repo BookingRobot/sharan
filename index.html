@@ -147,6 +147,37 @@ details ul{padding-left:4px}
 @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .dots{letter-spacing:6px;font-size:1.2rem}
 @media (max-width:560px){.item .row{flex-wrap:wrap}.item .row>button{width:100%}.ico{width:60px;height:60px}}
+/* 2 dienos filmukas (kinas.js) */
+#kino{padding:22px 0 0}
+#kino h2{margin:0 0 4px;font-size:clamp(1.35rem,5.2vw,2rem);line-height:1.15}
+.kino-sub{color:var(--muted);font-weight:600;font-size:.95rem;margin:0 0 12px}
+.kino-box{--u:.35px;position:relative;aspect-ratio:4/5;width:100%;max-width:max(300px,calc((100vh - 150px)*.8));margin:0 auto;border-radius:18px;overflow:hidden;background:#0E1430;box-shadow:0 14px 40px rgba(14,20,48,.3);-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;color:#F4F1EA;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+.kino-box svg{display:block;width:100%;height:100%}
+.kino-hud{position:absolute;left:0;right:0;top:0;display:flex;gap:calc(var(--u)*10);align-items:center;padding:calc(var(--u)*22) calc(var(--u)*24);font-weight:700;font-size:clamp(10px,calc(var(--u)*27),20px);pointer-events:none}
+.kino-hud span{background:rgba(14,20,48,.84);border-radius:999px;padding:calc(var(--u)*8) calc(var(--u)*18);white-space:nowrap}
+.kino-hud .gr{flex:1;background:none;padding:0}
+.kino-hud b{color:#F7C948}
+.kino-cap{position:absolute;left:0;right:0;bottom:0;min-height:calc(var(--u)*210);display:flex;align-items:center;justify-content:center;text-align:center;padding:calc(var(--u)*46) calc(var(--u)*44) calc(var(--u)*30);background:linear-gradient(rgba(14,20,48,0),rgba(14,20,48,.92) 36%);font-weight:700;font-size:clamp(13px,calc(var(--u)*37),27px);line-height:1.28;pointer-events:none;text-wrap:balance}
+.kino-cap:empty{display:none}
+.kino-cap span{animation:kinoCap .3s ease-out}
+@keyframes kinoCap{from{opacity:0;transform:translateY(8px)}}
+.kino-ask{position:absolute;left:7%;right:7%;bottom:15%;background:#fffdf8;color:#1f2328;border-radius:calc(var(--u)*30);padding:calc(var(--u)*32);text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.4);font-size:clamp(16px,calc(var(--u)*40),30px);font-weight:800}
+.kino-ask[hidden]{display:none}
+.kino-ask button{display:block;width:100%;margin-top:calc(var(--u)*18);font-size:clamp(13px,calc(var(--u)*31),22px);padding:calc(var(--u)*22) calc(var(--u)*12)}
+.kino-ask button.ghost{background:#f1ece1;color:#1f2328}
+.kino-cover{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*20);text-align:center;padding:calc(var(--u)*64);background:rgba(14,20,48,.9)}
+.kino-cover[hidden]{display:none}
+.kc-k{font-size:clamp(10px,calc(var(--u)*27),20px);font-weight:700;letter-spacing:.18em;color:#9FA7C6}
+.kc-t{font-family:'Bricolage Grotesque','Arial Black',system-ui,sans-serif;font-weight:800;font-size:calc(var(--u)*100);line-height:1;letter-spacing:-.03em;color:#F7C948}
+.kc-s{font-size:clamp(13px,calc(var(--u)*34),25px);font-weight:600;line-height:1.32}
+.kc-n{font-size:clamp(11px,calc(var(--u)*27),20px);color:#9FA7C6;font-weight:600}
+.kc-play{font-size:clamp(16px,calc(var(--u)*42),30px);padding:calc(var(--u)*24) calc(var(--u)*48);border-radius:999px;background:#F7C948;color:#0E1430;margin:calc(var(--u)*12) 0}
+.kc-list{display:flex;flex-wrap:wrap;gap:calc(var(--u)*10);justify-content:center}
+.kc-list span{background:rgba(244,241,234,.13);border-radius:999px;padding:calc(var(--u)*8) calc(var(--u)*18);font-size:clamp(10.5px,calc(var(--u)*27),20px);font-weight:700}
+.kino-txt{margin-top:18px}
+.kino-txt h3{margin:0 0 4px;font-size:1.2rem;line-height:1.3}
+.kino-txt p{margin:10px 0}
+.kino-txt .fin{background:var(--warn-bg);border-radius:10px;padding:10px 12px}
 /* dienos suvestinė: plakatas puslapio viršuje */
 #suv{padding:20px 0 0}
 .suv-box{position:relative;aspect-ratio:4/5;width:100%;max-width:max(300px,calc((100vh - 170px)*.8));margin:0 auto;border-radius:18px;overflow:hidden;background:#0E1430;box-shadow:0 14px 40px rgba(14,20,48,.3);-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
@@ -164,11 +195,15 @@ details ul{padding-left:4px}
 .suv-pal .sw{width:34px;height:34px;padding:0;border-radius:50%;background:var(--sw);border:2px solid var(--line)}
 .suv-pal .sw.on{outline:3px solid var(--accent);outline-offset:2px}
 .suv-foot{display:none}
+.suv-h{margin:14px 0 10px}
+.suv-days{display:flex;gap:8px;justify-content:center;margin:0 auto 12px;max-width:520px}
+.suv-days button{flex:1 1 0;padding:9px 6px;font-size:.92rem;white-space:nowrap;background:var(--chip);color:var(--ink)}
+.suv-days button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 #suvModal img{display:block;max-width:100%;max-height:56vh;margin:10px auto 0;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
 @media print{
   html.suv-print,html.suv-print body{background:#fff!important;color:#000!important}
   html.suv-print #gate,html.suv-print .modal,html.suv-print .toast,html.suv-print .wrap>*:not(#suv),
-  html.suv-print .suv-ctl,html.suv-print .suv-hint,html.suv-print .suv-pal,html.suv-print .suv-fx{display:none!important}
+  html.suv-print .suv-ctl,html.suv-print .suv-hint,html.suv-print .suv-pal,html.suv-print .suv-fx,html.suv-print .suv-h,html.suv-print .suv-days{display:none!important}
   html.suv-print .wrap{max-width:none;padding:0}
   html.suv-print #suv{padding:0}
   html.suv-print .suv-box{width:178mm;max-width:100%;border-radius:0;box-shadow:none!important;break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -209,7 +244,49 @@ document.getElementById("gateForm").addEventListener("submit",function(e){
 if(document.documentElement.classList.contains("locked")) setTimeout(function(){document.getElementById("gatePw").focus()},50);
 </script>
 <div class="wrap">
+<section id="kino" aria-label="Antros dienos filmukas">
+  <h2>🎬 2 diena: Berlynas – Miunchenas</h2>
+  <p class="kino-sub">2026-11-19 · 8 valandų kelionė, kuri turėjo trukti 6. Interaktyvus filmukas.</p>
+  <div class="kino-box" id="kinoBox">
+    <div class="kino-hud"><span>2 diena · 11-19</span><span class="gr"></span><span>💧 <b id="kHudP">0</b></span><span>⛽ <b id="kHudL">0</b></span><span>🛣️ ~<b id="kHudK">0</b> km</span></div>
+    <div class="kino-cap" id="kinoCap" aria-live="polite"></div>
+    <div class="suv-fx" id="kinoFx"></div>
+    <div class="kino-ask" id="kinoAsk" hidden></div>
+    <div class="kino-cover" id="kinoCover">
+      <div class="kc-k">2 DIENA · 2026-11-19</div>
+      <div class="kc-t">Berlynas – Miunchenas</div>
+      <div class="kc-s">8 valandų kelionė, kuri turėjo trukti 6</div>
+      <button type="button" class="kc-play" id="kinoStart">▶ Paleisti filmuką</button>
+      <div class="kc-n">Vaidina: visas ekipažas ir viena dvasia</div>
+    </div>
+  </div>
+  <div class="suv-ctl">
+    <button type="button" id="kinoPlay">▶ Paleisti</button>
+    <button type="button" class="ghost" id="kinoNext">⏭ Kitas sustojimas</button>
+    <button type="button" class="ghost" id="kinoRestart">🔁 Iš naujo</button>
+  </div>
+  <p class="suv-hint">👆 Bakstelėk herojus, dvasią, Šaraną, balą ar miestą žemėlapyje</p>
+  <div class="box kino-txt">
+    <h3>🚗 Berlynas – Miunchenas. 8 valandų kelionė, kuri turėjo trukti 6!</h3>
+    <div class="stats"><span>~660 km vietoj 590</span><span>8 val. vietoj 6</span><span>3 Vokietijos žemės</span><span>10 miestų</span></div>
+    <p>Planas buvo paprastas: iš Berlyno į Miuncheną, maždaug 590 km ir apie 6 valandos kelio. Navigacija siūlė važiuoti per Leipcigą, tačiau kažkokiu būdu mūsų maršrute atsirado Drezdenas. Taip vietoj tiesesnio kelio gavome maždaug 650–660 km kelionę ir visas 8 valandas automobilyje. 😁</p>
+    <p>Pakeliui pravažiavome net tris Vokietijos žemes:</p>
+    <p>🇩🇪 <b>Brandenburgas</b> – išvažiavome iš Berlyno ir kirtome šią žemę, garsėjančią miškais, ežerais ir istoriniais Prūsijos miestais.</p>
+    <p>🏰 <b>Saksonija</b> – čia atsidūrėme Drezdene, viename gražiausių Vokietijos miestų, vadinamame Elbės Florencija. Toliau važiavome pro Chemnicą, Zwickau ir Plaueną. Saksonija turi įspūdingą istoriją, susijusią su Saksonijos karalyste, pramone ir Rytų Vokietijos laikotarpiu.</p>
+    <p>🍺 <b>Bavarija</b> – galiausiai pasiekėme Bavariją, didžiausią Vokietijos federalinę žemę. Važiavome pro Hofą, Bayreuthą, Niurnbergą, Ingolštatą ir pagaliau pasiekėme Miuncheną. Čia jau visai kita atmosfera – Alpių artumas, alaus tradicijos, pilys ir savitas bavarų charakteris.</p>
+    <p>Bet kelionė turėjo ir savų iššūkių!</p>
+    <p>⛽ Pirmiausia – <b>dujos automobiliui</b>. Jų ieškojome intensyviai. Nors bake jų dar buvo nemažai, ne kiekvienoje degalinėje buvo LPG kolonėlė. O kai rasdavome, kartais tekdavo gerokai nukrypti nuo autobano.</p>
+    <p>🚻 Antra problema – <b>sustojimai</b>. Panašu, kad pravažiavome beveik visas pakelės poilsio aikšteles. Tualeto pertraukėlės tapo beveik privaloma kiekvieno sustojimo programa. O kai kurios degalinės ir poilsio vietos buvo taip įrengtos, kad nuo autobano tekdavo išsukti ir dar pavažiuoti iki jų.</p>
+    <p>Taigi vietoj planuotų 6 valandų turėjome 8 valandų kelionę, papildomų kilometrų, dujų paieškas, daug sustojimų ir progą pamatyti daugiau Vokietijos.</p>
+    <p><b>Išvada:</b> Vokietija didelė, autobanai greiti, bet kelionės planą kartais sudarinėja ne navigacija, o dujų kolonėlės ir žmogaus fiziologija. 😂</p>
+    <p class="fin">🍖 <b>Dienos finalas:</b> valgėme kiaulės koją, karką, bare, kur kadaise iškilo Hitleris. Mes ten iškėlėm tik bokalus. Jam viskas baigėsi blogai, o šįvakar blogai baigėsi tik karkai.</p>
+    <p><b>Galutinis tikslas pasiektas – MES MIUNCHENE! 🍻</b></p>
+    <p class="why">👻 Abramovič šią dieną keliavo tik kaip dvasia: į kelionę jis taip ir neišvažiavo.</p>
+  </div>
+</section>
 <section id="suv" aria-label="Dienos suvestinė">
+  <h2 class="suv-h">📊 Dienos suvestinė</h2>
+  <div class="suv-days" id="suvDays" role="group" aria-label="Pasirink dieną"></div>
   <div class="suv-box" id="suvBox"><div class="suv-fx" id="suvFx"></div></div>
   <div class="suv-ctl">
     <button type="button" id="suvPrint">🖨️ Spausdinti</button>
@@ -780,14 +857,15 @@ $("#dlJson").onclick=()=>download("sarano-rinkinys.json",JSON.stringify(sorted()
 load(); setInterval(()=>{ if(!document.hidden && !pending) load() },20000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden && !pending) load()});
 </script>
+<script src="kinas.js?v=1"></script>
 <script id="suvJs">
 /* ===== Dienos suvestinė: interaktyvus plakatas puslapio viršuje =====
-   Nauja diena = pakeisti DAY (skaičiai, maršrutas, juokai). Viskas piešiama kaip SVG 1080x1350,
-   todėl vienodai atrodo telefone, spaudoje ir atsisiųstame paveikslėlyje. */
+   Nauja diena = pridėti naują įrašą į DAYS galą (skaičiai, maršrutas, juokai): rodoma paskutinė, kitos pasiekiamos mygtukais virš plakato.
+   Viskas piešiama kaip SVG 1080x1350, todėl vienodai atrodo telefone, spaudoje ir atsisiųstame paveikslėlyje. */
 (function(){
 const box=document.getElementById("suvBox"); if(!box) return;
-const DAY={
-  date:"2026-11-18", route:["LT","PL","DE"],
+const DAYS=[{
+  date:"2026-11-18", tab:"1 diena · 11-18", route:["LT","PL","DE"],
   big:"6 000", bigUnit:"km", sub:"su Sharanu", sub2:"visi po 1 000 km",
   laughs:["HAHAHAHA","CHA CHA CHA","PYP PYYYP!","KHE KHE KHE","VAROM TOLIAU!","HAHAHAHA!!!"],
   // v: skaičius, u: vienetas, pre: ženklas prieš, t: parašas, e: kas išlekia paspaudus, f: faktas paspaudus (suskaičiuotas iš tų pačių skaičių)
@@ -801,12 +879,29 @@ const DAY={
     {ic:"wc",v:"8",u:"×",us:48,gap:4,t:"buvom tualetuose",e:"🚽",f:"stojom kas ~125 km"},
     {ic:"clock",v:"10",u:"min",gap:8,t:"kalbėjomės apie vaikus ir mokslus",e:"⏱️",f:"likusį laiką: hahaha"},
   ]
-};
+},{
+  // 2 diena: skaičiai iš Mindaugo dienos teksto (590 km ir 6 val. planas, 650–660 km ir 8 val. išėjo)
+  date:"2026-11-19", tab:"2 diena · 11-19", route:["BB","SN","BY"],
+  big:"660", bigUnit:"km", sub:"Berlynas – Miunchenas", sub2:"planavom 590 km",
+  laughs:["KUR LPG?!","STOJAM!","O LEIPCIGAS?","Į KRŪMUS!","VAROM TOLIAU!","PROST!"],
+  stats:[
+    {ic:"clock",v:"8",u:"val.",gap:8,t:"kelyje, nors planavom 6",e:"⏱️",f:"+2 val., trečdaliu ilgiau"},
+    {ic:"route",pre:"+",v:"60–70",u:"km",gap:8,t:"lankstas per Drezdeną",e:"🧭",f:"navigacija siūlė per Leipcigą"},
+    {ic:"flag",v:"3",t:"Vokietijos žemės per vieną dieną",e:"🏰",f:"Brandenburgas, Saksonija, Bavarija"},
+    {ic:"pin",v:"10",t:"miestų nuo Berlyno iki Miuncheno",e:"📍",f:"Drezdenas maršrute atsirado pats"},
+    {ic:"fuel",v:"LPG",t:"kolonėlių ieškojom intensyviai",e:"⛽",f:"nors bake dar buvo nemažai"},
+    {ic:"wc",pre:"~",v:"100",u:"%",gap:6,t:"pakelės poilsio aikštelių aplankyta",e:"🚽",f:"tualetas: privaloma programa"},
+    {ic:"ghost",v:"1",u:"dvasia",gap:10,t:"Abramovič taip ir neišvažiavo",e:"👻",f:"keliavo tik mintimis"},
+    {ic:"ham",v:"1",u:"karka",gap:10,t:"kiaulės koja Miunchene dienos finalui",e:"🍖",f:"bare, kur kadaise iškilo Hitleris"},
+  ]
+}];
+let DAY=DAYS[DAYS.length-1];
 const A="#F7C948", INK="#F4F1EA", MUT="#9FA7C6", NAVY="#0E1430", NS="http://www.w3.org/2000/svg";
 const FONT_URL="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700..800&family=Inter:wght@500..700&display=swap";
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const still=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const FLAGS={LT:["#FDB913","#006A44","#C1272D"],PL:["#FFFFFF","#DC143C"],DE:["#111111","#DD0000","#FFCE00"],
+  BB:["#C8102E","#FFFFFF"],SN:["#FFFFFF","#00843D"],BY:["#FFFFFF","#0098D4"], // Vokietijos žemės: Brandenburgas, Saksonija, Bavarija
   CZ:["#FFFFFF","#D7141A"],NL:["#AE1C28","#FFFFFF","#21468B"],AT:["#ED2939","#FFFFFF","#ED2939"],LV:["#9E3039","#FFFFFF","#9E3039"]};
 const IC={
   arrow:`<path d="M4 12h16M14 6l6 6-6 6"/>`,
@@ -817,7 +912,12 @@ const IC={
   chat:`<path d="M4.5 4.5h15a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H10l-4.5 3.5v-3.5h-1a1 1 0 0 1-1-1v-10a1 1 0 0 1 1-1z"/><path d="M8.5 10.5c1.6 2 5.4 2 7 0"/>`,
   laugh:`<circle cx="12" cy="12" r="8.75"/><path d="M8.2 9.6c.6-.8 1.6-.8 2.2 0M13.6 9.6c.6-.8 1.6-.8 2.2 0"/><path d="M7.8 13h8.4a4.2 4.2 0 0 1-8.4 0z"/>`,
   wc:`<path d="M6 3.5h6V9H6z"/><path d="M4 9h14.5c0 3.4-2.4 6-5.6 6.5l.7 5H8.4l.6-5.1C6.1 14.7 4 12.3 4 9z"/>`,
-  clock:`<circle cx="12" cy="12" r="8.75"/><path d="M12 7.5V12l3 2"/>`
+  clock:`<circle cx="12" cy="12" r="8.75"/><path d="M12 7.5V12l3 2"/>`,
+  route:`<circle cx="6" cy="18.5" r="2.3"/><circle cx="18" cy="5.5" r="2.3"/><path d="M8.3 18.5H15a3.25 3.25 0 0 0 0-6.5H9a3.25 3.25 0 0 1 0-6.5h6.7"/>`,
+  flag:`<path d="M5.5 21V3.5"/><path d="M5.5 4.5h12.5l-3 4.25 3 4.25H5.5"/>`,
+  pin:`<path d="M12 21s-6.5-6.2-6.5-11.2a6.5 6.5 0 0 1 13 0C18.500 14.8 12 21 12 21z"/><circle cx="12" cy="9.8" r="2.4"/>`,
+  ghost:`<path d="M5 20.5V11a7 7 0 0 1 14 0v9.5l-2.33-2-2.33 2-2.34-2-2.33 2-2.34-2z"/><path d="M9.5 10.2v1.4M14.5 10.2v1.4"/>`,
+  ham:`<path d="M13.2 14.6c-3.6.5-6.6-1.900-6.900-5.200S8.600 3.300 12 3.500s6.600 2.300 7 5.600-.9 4.500-3 5.200"/><path d="M13.2 14.6l1.900 3.100M16 14.300l1.700 2.800"/><path d="M15.100 17.700a1.700 1.700 0 1 0 2.300 2.200 1.700 1.700 0 1 0 .300-3.100"/><path d="M10 7.200c1.300-.9 3.100-.9 4.500 0"/>`
 };
 const CSS=`
 .suv text{font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-weight:500}
@@ -942,10 +1042,12 @@ ${wheel(92)}${wheel(322)}
 <rect class="hit" x="${tx-10}" y="${ty+6}" width="460" height="162" rx="12"/></g>`; });
   return `<svg xmlns="${NS}" id="suvSvg" class="suv" viewBox="0 0 1080 1350" role="group" aria-label="Šarano dienos suvestinė, ${esc(d.date)}">${s}</svg>`;
 }
-box.insertAdjacentHTML("afterbegin",build());
 const $=id=>document.getElementById(id);
-const sec=$("suv"), svg=$("suvSvg"), fx=$("suvFx"), scene=$("suvScene"), bub=$("suvBub");
-$("suvFootDate").textContent=DAY.date; if(location.host) $("suvFootHost").textContent=location.host;
+const sec=$("suv"), fx=$("suvFx");
+let svg, scene, bub;
+function draw(){ const old=$("suvSvg"); if(old) old.remove(); box.insertAdjacentHTML("afterbegin",build());
+  svg=$("suvSvg"); scene=$("suvScene"); bub=$("suvBub"); $("suvFootDate").textContent=DAY.date }
+draw(); if(location.host) $("suvFootHost").textContent=location.host;
 
 /* --- išdėstymas pagal tikrą šrifto plotį --- */
 function setBubble(txt){ const t=$("suvBubT"); t.textContent=txt; const len=t.getComputedTextLength(); if(len>10) $("suvBubP").setAttribute("d",bubPath(Math.round(len+40))) }
@@ -977,8 +1079,8 @@ function tapTile(i){ const t=DAY.stats[i], g=svg.querySelector(`[data-tap="t${i}
   g.querySelectorAll(".cnt").forEach(el=>count(el,900)); burst((i%2?568:72)+23,606.4+172.9*(i>>1)+57,t.e,7);
   if(t.f){ cap.classList.remove("fact"); cap.getBoundingClientRect(); cap.textContent=t.f; cap.classList.add("fact"); clearTimeout(cap._t); cap._t=setTimeout(()=>{cap.textContent=t.t;cap.classList.remove("fact")},3800) } }
 function act(k){ if(k==="van") honk(); else if(k==="km"){ svg.querySelectorAll('[data-tap="km"] .cnt').forEach(el=>count(el,1500)); burst(300,200,"💨",6) } else tapTile(+k.slice(1)) }
-svg.addEventListener("click",e=>{ if(col) return paintAt(e.target); const g=e.target.closest("[data-tap]"); if(g) act(g.dataset.tap) });
-svg.addEventListener("keydown",e=>{ if(col||(e.key!=="Enter"&&e.key!==" ")) return; const g=e.target.closest("[data-tap]"); if(g){ e.preventDefault(); act(g.dataset.tap) } });
+box.addEventListener("click",e=>{ if(col) return paintAt(e.target); const g=e.target.closest("[data-tap]"); if(g) act(g.dataset.tap) });
+box.addEventListener("keydown",e=>{ if(col||(e.key!=="Enter"&&e.key!==" ")) return; const g=e.target.closest("[data-tap]"); if(g){ e.preventDefault(); act(g.dataset.tap) } });
 
 /* --- animacija tik kai plakatas matomas; pirmą kartą pasirodžius suskaičiuojam --- */
 let seen=false;
@@ -987,11 +1089,12 @@ if("IntersectionObserver" in window) new IntersectionObserver(es=>es.forEach(en=
 
 /* --- spalvinimo režimas --- */
 const PAL=[["#F7C948","Geltona"],["#FF9A5C","Oranžinė"],["#E03131","Raudona"],["#F06595","Rožinė"],["#7048E8","Violetinė"],["#3E6FD8","Mėlyna"],["#4DABF7","Žydra"],["#2F9E44","Žalia"],["#8D5A3B","Ruda"],["#868E96","Pilka"],["#1F2328","Juoda"],["#FFFFFF","Trintukas"]];
-const PKEY="sharan-spalvos-"+DAY.date;
+const pkey=()=>"sharan-spalvos-"+DAY.date;
 let col=false, cur=PAL[0][0], paint={};
-try{ paint=JSON.parse(localStorage.getItem(PKEY)||"{}")||{} }catch(e){}
+function loadPaint(){ paint={}; try{ paint=JSON.parse(localStorage.getItem(pkey())||"{}")||{} }catch(e){} }
+loadPaint();
 function applyPaint(){ svg.querySelectorAll(".pt").forEach(el=>{ const c=paint[el.dataset.k]; if(c) el.style.setProperty("--c",c); else el.style.removeProperty("--c") }) }
-function savePaint(){ try{ localStorage.setItem(PKEY,JSON.stringify(paint)) }catch(e){} }
+function savePaint(){ try{ localStorage.setItem(pkey(),JSON.stringify(paint)) }catch(e){} }
 function paintAt(target){ const el=target.closest(".pt"); if(!el) return; const k=el.dataset.k;
   if(cur==="#FFFFFF") delete paint[k]; else paint[k]=cur; savePaint(); applyPaint() }
 const pal=$("suvPal");
@@ -1004,6 +1107,13 @@ $("suvCol").onclick=()=>{ col=!col; svg.classList.toggle("col",col); sec.classLi
   $("suvCol").textContent=col?"🌙 Grįžti į naktį":"🖍️ Spalvinti";
   $("suvHint").textContent=col?"🖍️ Pasirink spalvą ir spausk ant Šarano, skaičių ar dangaus. Arba spausdink ir spalvink flomasteriais.":"👆 Paspausk Šaraną, burbulą ar skaičius" };
 applyPaint();
+
+/* --- dienų perjungimas --- */
+const days=$("suvDays");
+function tabs(){ days.innerHTML=DAYS.map((d,i)=>`<button type="button" data-i="${i}" aria-pressed="${d===DAY}">${esc(d.tab||d.date)}</button>`).join("") }
+days.addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return; const d=DAYS[+b.dataset.i]; if(!d||d===DAY) return;
+  DAY=d; laugh=0; fx.innerHTML=""; draw(); svg.classList.toggle("col",col); fit(); loadPaint(); applyPaint(); tabs(); seen=true; countAll() });
+tabs();
 
 /* --- spausdinimas: tik plakatas, A4 --- */
 // klasė nuimama tik po kito prisilietimo: telefonuose print() grįžta iškart, o lapas piešiamas vėliau

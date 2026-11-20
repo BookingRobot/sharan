@@ -158,6 +158,7 @@ details ul{padding-left:4px}
 .kino-hud .gr{flex:1;background:none;padding:0}
 .kino-hud b{color:#F7C948}
 .kino-cap{position:absolute;left:0;right:0;bottom:0;min-height:calc(var(--u)*210);display:flex;align-items:center;justify-content:center;text-align:center;padding:calc(var(--u)*46) calc(var(--u)*44) calc(var(--u)*30);background:linear-gradient(rgba(14,20,48,0),rgba(14,20,48,.92) 36%);font-weight:700;font-size:clamp(13px,calc(var(--u)*37),27px);line-height:1.28;pointer-events:none;text-wrap:balance}
+.kino-cap.big{min-height:calc(var(--u)*250);padding-bottom:calc(var(--u)*40);font-size:clamp(15px,calc(var(--u)*44),32px);line-height:1.3;background:linear-gradient(rgba(14,20,48,0),rgba(14,20,48,.97) 30%)}
 .kino-cap:empty{display:none}
 .kino-cap span{animation:kinoCap .3s ease-out}
 @keyframes kinoCap{from{opacity:0;transform:translateY(8px)}}
@@ -279,10 +280,10 @@ if(document.documentElement.classList.contains("locked")) setTimeout(function(){
     <p>🚻 Antra problema – <b>sustojimai</b>. Panašu, kad pravažiavome beveik visas pakelės poilsio aikšteles. Tualeto pertraukėlės tapo beveik privaloma kiekvieno sustojimo programa. O kai kurios degalinės ir poilsio vietos buvo taip įrengtos, kad nuo autobano tekdavo išsukti ir dar pavažiuoti iki jų.</p>
     <p>Taigi vietoj planuotų 6 valandų turėjome 8 valandų kelionę, papildomų kilometrų, dujų paieškas, daug sustojimų ir progą pamatyti daugiau Vokietijos.</p>
     <p><b>Išvada:</b> Vokietija didelė, autobanai greiti, bet kelionės planą kartais sudarinėja ne navigacija, o dujų kolonėlės ir žmogaus fiziologija. 😂</p>
-    <p class="fin">🍖 <b>Dienos finalas:</b> valgėme kiaulės koją, karką, bare, kur kadaise iškilo Hitleris. Mes ten iškėlėm tik bokalus. Jam viskas baigėsi blogai, o šįvakar blogai baigėsi tik karkai.</p>
+    <p class="fin">🍖 <b>Dienos finalas:</b> valgėme kiaulės koją, karką, bare, kur kadaise iškilo Hitleris. Prie mūsų stalo sėdėjo du turistai iš Japonijos: valgė savo karkas, gėrė alų ir mus fotografavo, o padavėjas vis nešė dar alaus. Modė papasakojo baro istoriją, nuotraukoje likome liūdni, bet tada užgrojo muzikantai su tautiniais rūbais. Šįvakar čia iškilo tik bokalai, o blogai baigėsi tik karkai.</p>
     <p><b>Galutinis tikslas pasiektas – MES MIUNCHENE! 🍻</b></p>
     <p class="why">👻 Abramovič šią dieną keliavo tik kaip dvasia: į kelionę jis taip ir neišvažiavo.</p>
-    <p class="why">😂 Juokas netilo visą kelią. 🚬 Modė kiekviename sustojime ant greičio surūkydavo po 3 cigaretes ir sutrypdavo batu. 🧻 Thūlė nepraleido degalinių tualetų.</p>
+    <p class="why">😂 Juokas netilo visą kelią. 🚬 Modė kiekviename sustojime ant greičio surūkydavo po 3 cigaretes, sutrypdavo jas batu ir užgerdavo alumi. 🧻 Thūlė į tualetą ėjo kas antroje degalinėje. 🛞 O ratus vis kas nors paspardydavo: ale patikrino.</p>
   </div>
 </section>
 <section id="suv" aria-label="Dienos suvestinė">
@@ -858,7 +859,7 @@ $("#dlJson").onclick=()=>download("sarano-rinkinys.json",JSON.stringify(sorted()
 load(); setInterval(()=>{ if(!document.hidden && !pending) load() },20000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden && !pending) load()});
 </script>
-<script src="kinas.js?v=2"></script>
+<script src="kinas.js?v=3"></script>
 <script id="suvJs">
 /* ===== Dienos suvestinė: interaktyvus plakatas puslapio viršuje =====
    Nauja diena = pridėti naują įrašą į DAYS galą (skaičiai, maršrutas, juokai): rodoma paskutinė, kitos pasiekiamos mygtukais virš plakato.

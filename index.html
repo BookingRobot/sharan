@@ -248,7 +248,7 @@ if(document.documentElement.classList.contains("locked")) setTimeout(function(){
   <h2>🎬 2 diena: Berlynas – Miunchenas</h2>
   <p class="kino-sub">2026-11-19 · 8 valandų kelionė, kuri turėjo trukti 6. Interaktyvus filmukas.</p>
   <div class="kino-box" id="kinoBox">
-    <div class="kino-hud"><span>2 diena · 11-19</span><span class="gr"></span><span>💧 <b id="kHudP">0</b></span><span>⛽ <b id="kHudL">0</b></span><span>🛣️ ~<b id="kHudK">0</b> km</span></div>
+    <div class="kino-hud"><span>2 diena · 11-19</span><span class="gr"></span><span>💧 <b id="kHudP">0</b></span><span>🧻 <b id="kHudW">0</b></span><span>🚬 <b id="kHudC">0</b></span><span>⛽ <b id="kHudL">0</b></span><span>🛣️ ~<b id="kHudK">0</b> km</span></div>
     <div class="kino-cap" id="kinoCap" aria-live="polite"></div>
     <div class="suv-fx" id="kinoFx"></div>
     <div class="kino-ask" id="kinoAsk" hidden></div>
@@ -265,7 +265,7 @@ if(document.documentElement.classList.contains("locked")) setTimeout(function(){
     <button type="button" class="ghost" id="kinoNext">⏭ Kitas sustojimas</button>
     <button type="button" class="ghost" id="kinoRestart">🔁 Iš naujo</button>
   </div>
-  <p class="suv-hint">👆 Bakstelėk herojus, dvasią, Šaraną, balą ar miestą žemėlapyje</p>
+  <p class="suv-hint">👆 Bakstelėk herojus, dvasią, Šaraną, balą, degalinę ar miestą žemėlapyje</p>
   <div class="box kino-txt">
     <h3>🚗 Berlynas – Miunchenas. 8 valandų kelionė, kuri turėjo trukti 6!</h3>
     <div class="stats"><span>~660 km vietoj 590</span><span>8 val. vietoj 6</span><span>3 Vokietijos žemės</span><span>10 miestų</span></div>
@@ -282,6 +282,7 @@ if(document.documentElement.classList.contains("locked")) setTimeout(function(){
     <p class="fin">🍖 <b>Dienos finalas:</b> valgėme kiaulės koją, karką, bare, kur kadaise iškilo Hitleris. Mes ten iškėlėm tik bokalus. Jam viskas baigėsi blogai, o šįvakar blogai baigėsi tik karkai.</p>
     <p><b>Galutinis tikslas pasiektas – MES MIUNCHENE! 🍻</b></p>
     <p class="why">👻 Abramovič šią dieną keliavo tik kaip dvasia: į kelionę jis taip ir neišvažiavo.</p>
+    <p class="why">😂 Juokas netilo visą kelią. 🚬 Modė kiekviename sustojime ant greičio surūkydavo po 3 cigaretes ir sutrypdavo batu. 🧻 Thūlė nepraleido degalinių tualetų.</p>
   </div>
 </section>
 <section id="suv" aria-label="Dienos suvestinė">
@@ -857,7 +858,7 @@ $("#dlJson").onclick=()=>download("sarano-rinkinys.json",JSON.stringify(sorted()
 load(); setInterval(()=>{ if(!document.hidden && !pending) load() },20000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden && !pending) load()});
 </script>
-<script src="kinas.js?v=1"></script>
+<script src="kinas.js?v=2"></script>
 <script id="suvJs">
 /* ===== Dienos suvestinė: interaktyvus plakatas puslapio viršuje =====
    Nauja diena = pridėti naują įrašą į DAYS galą (skaičiai, maršrutas, juokai): rodoma paskutinė, kitos pasiekiamos mygtukais virš plakato.

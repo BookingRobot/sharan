@@ -3,6 +3,8 @@
    Žemėlapyje važiuoja mašiniukas, kiekviename taške rodomas stambus planas: visi išlipa,
    nueina į krūmus, atsiranda bala, visi sulipa atgal ir dumia toliau.
    Herojai imami iš index.html (CHAR, face). Abramovič keliauja tik kaip dvasia.
+   Nuolatiniai pokštai: Thūlė kas trečią sustojimą (ir visur, kur pilam dujas) bėga į degalinės tualetą,
+   Modė išlipęs surūko 3 cigaretes ir sutrypia batu, visi kas kelias sekundes juokiasi.
    Kita diena = nauji STOPS (miestai, tekstai), LAND (fono siluetai) ir TW (sustojimo pokštai). */
 (function(){
 "use strict";
@@ -29,7 +31,7 @@ const STOPS=[
        "Atsirado bala. Visi atgal ir dumiam toliau!"]},
  {id:"chemnitz",n:"Chemnicas",lat:50.83,lon:12.92,land:"Saksonija",km:265,sky:1,lb:[26,44,"start"],prop:"lpgNo",lpg:1,via:[[652,553],[634,516]],road:"Kur čia LPG?",
   cap:["Chemnicas. Ieškom dujų. Bake jų dar nemažai, bet ieškom.",
-       "LPG kolonėlės čia nėra. Užtat krūmai yra.",
+       "LPG kolonėlės čia nėra. Užtat yra krūmai, o Thūlei ir degalinės tualetas.",
        "Bala nr. 2. Varom!"]},
  {id:"zwickau",n:"Zwickau",lat:50.72,lon:12.49,land:"Saksonija",km:305,sky:2,lb:[-22,-28,"end"],prop:"trabi",road:"Stojam?",
   cap:["Zwickau, Trabanto gimtinė. Šaranas čia pasijuto jaunas.",
@@ -64,8 +66,8 @@ const N=STOPS.length;
 const LINES={
  "Simonas":["Kas kiek spaudžiat?","Krūmas irgi treniruotė","Dar vieną priėjimą!","Pakelčiau tą Šaraną"],
  "Deksnys":["Pagal skaičiavimus: stojam","Slėgis kritinis","Čia reikia brėžinio","Tolerancija viršyta"],
- "Thūlė":["KIJA!","Jaunystėj krūmų nereikėjo","Senam visur krūmas","Kvėpuojam pilvu"],
- "Modė":["Balsuojam: kas už krūmus?","Priimta vienbalsiai","Valstybinės svarbos reikalas","Siūlau pertrauką"],
+ "Thūlė":["KIJA!","Jaunystėj krūmų nereikėjo","Kur artimiausia degalinė?","Kvėpuojam pilvu"],
+ "Modė":["Balsuojam: kas už krūmus?","Priimta vienbalsiai","Dar tris ir važiuojam","Siūlau perrūkymo pertrauką"],
  "Kvedaravičius":["Navigacija sakė: Leipcigas!","Kas čia vairavo?!","Dar 6 valandos. Ne, 8.","Aš tik keleivis"],
  "Vacys":["Pristatymas per 8 val.","Čia Prime negalioja","Užsakau krūmą į namus","Optimizuojam maršrutą"],
  "Abramovič":["Uuuu… aš su jumis dvasia","Man nereikia. Aš dvasia.","Bū!","Namie šilčiau, uuuu…"]
@@ -197,7 +199,10 @@ const CSS=`
 .kino .kbub.nav .kbt{fill:#F7C948}
 .kino .kpop{animation:kPop .28s cubic-bezier(.3,1.6,.5,1)}
 .kino .kpss{font-size:34px;fill:#fff;font-style:italic;paint-order:stroke;stroke:#1f2328;stroke-width:6px;stroke-linejoin:round}
-.kino .ka,.kino #kVan,.kino #kPudG,.kino #kMeat,.kino .kmug{cursor:pointer}
+.kino .ka,.kino #kVan,.kino #kPudG,.kino #kMeat,.kino .kmug,.kino #kStation{cursor:pointer}
+.kino .kha{font-size:40px;fill:#ffe066;paint-order:stroke;stroke:#1f2328;stroke-width:7px;stroke-linejoin:round}
+.kino .kha.g{fill:#d0ebff;font-style:italic}
+.kino .klol{animation:kLol .62s ease-in-out}
 .kino .kroll .kspin{animation:kSpin .45s linear infinite}
 .kino .kfl{animation:kFloat 2.4s ease-in-out infinite}
 .kino .kpk{animation:kHop .5s ease-out}
@@ -205,6 +210,7 @@ const CSS=`
 @keyframes kSpin{to{transform:rotate(360deg)}}
 @keyframes kFloat{50%{transform:translateY(-12px)}}
 @keyframes kHop{0%{transform:none}35%{transform:translateY(-34px)}62%{transform:none}80%{transform:translateY(-10px)}100%{transform:none}}
+@keyframes kLol{0%,100%{transform:none}14%{transform:translateY(-11px)}28%{transform:none}42%{transform:translateY(-11px)}56%{transform:none}70%{transform:translateY(-7px)}84%{transform:none}}
 @keyframes kPop{0%{transform:scale(.3)}100%{transform:none}}
 @keyframes kRing{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(2.4)}}
 @keyframes kTw{50%{opacity:.2}}
@@ -256,10 +262,19 @@ function sceneSvg(){
 <path d="M-700 962 H640 Q700 962 700 1012 V1090 Q700 1140 640 1140 H-700 Z" fill="#5d6470"/>
 <path d="M-680 1128 H620" stroke="#fffdf8" stroke-width="5" stroke-dasharray="40 30" opacity=".5"/>
 <g id="kProps"></g>
+<g id="kStation" transform="translate(1250 1012)" style="display:none"><g id="kStB"><ellipse cx="0" cy="4" rx="142" ry="11" fill="rgba(0,0,0,.2)"/>
+<rect x="-116" y="-196" width="232" height="196" rx="6" fill="#f1f3f5" stroke="#1f2328" stroke-width="4"/>
+<rect x="-130" y="-234" width="260" height="44" rx="8" fill="#e03131" stroke="#1f2328" stroke-width="4"/><text x="0" y="-202" text-anchor="middle" font-size="27" fill="#fff">⛽ DEGALINĖ</text>
+<rect id="kStWin" x="-100" y="-166" width="88" height="66" rx="5" fill="#a5d8ff" stroke="#1f2328" stroke-width="3"/><path d="M-56 -166 V-100 M-100 -133 H-12" stroke="#1f2328" stroke-width="2.5"/>
+<rect id="kStBusy" x="-104" y="-86" width="96" height="30" rx="6" fill="#2f9e44"/><text id="kStBusyT" x="-56" y="-64" text-anchor="middle" font-size="19" fill="#fff">LAISVA</text>
+<rect x="4" y="-164" width="96" height="164" rx="5" fill="#1c7ed6" stroke="#1f2328" stroke-width="4"/><text x="52" y="-108" text-anchor="middle" font-size="36" fill="#fff">WC</text><circle cx="18" cy="-76" r="5.5" fill="#ffe066"/>
+<rect id="kStOpen" x="6" y="-162" width="92" height="162" rx="4" fill="#12172e" style="display:none"/></g></g>
 <g id="kVan"><g id="kVanB"><g id="kVanH"><ellipse cx="219" cy="168" rx="214" ry="7" fill="rgba(0,0,0,.25)"/><polygon id="kBeam" points="430,104 800,24 800,196 430,116" fill="#FFF1C4" opacity=".4" style="display:none"/>${vanCore(false)}</g></g></g>
 <path id="kHose" d="M680 892 Q640 1010 566 938" fill="none" stroke="#212529" stroke-width="8" stroke-linecap="round" style="display:none"/>
 <g id="kAct"></g>
+<g id="kButts"></g>
 <g id="kHedge">${hedge()}</g>
+<g id="kFront"></g>
 <path id="kTr" d="M868 1074 q-16 20 6 36" fill="none" stroke="#f3df63" stroke-width="10" stroke-linecap="round" opacity="0"/>
 <g id="kPudG" transform="translate(880 1124) scale(0)"><ellipse rx="180" ry="30" fill="#f3df63" stroke="#c9b23a" stroke-width="3"/><ellipse cx="-50" cy="-8" rx="46" ry="6" fill="#fff" opacity=".55"/></g>
 </g>
@@ -299,9 +314,9 @@ ${lamp(270)}${lamp(810)}
 box.insertAdjacentHTML("afterbegin",`<svg xmlns="${NS}" id="kinoSvg" class="kino kp" viewBox="0 0 1080 1350" role="img" aria-label="Filmukas: Šaranas važiuoja iš Berlyno į Miuncheną"><style>${CSS}</style>
 <defs><linearGradient id="kSkyG" x1="0" y1="0" x2="0" y2="1"><stop id="kSky0" offset="0" stop-color="#7cc6f7"/><stop id="kSky1" offset=".72" stop-color="#e3f4ff"/></linearGradient>
 <clipPath id="kWin"><path d="M22 46 Q22 39 30 39 L280 33 Q291 33 299 42 L337 86 L22 88 Z"/></clipPath></defs>
-${mapSvg()}${sceneSvg()}${barSvg()}<g id="kBub"></g><rect id="kFade" width="1080" height="1350" fill="#0E1430" opacity="0" pointer-events="none"/></svg>`);
+${mapSvg()}${sceneSvg()}${barSvg()}<g id="kHa" pointer-events="none"></g><g id="kBub"></g><rect id="kFade" width="1080" height="1350" fill="#0E1430" opacity="0" pointer-events="none"/></svg>`);
 
-const svg=$("kinoSvg"), mapG=$("kMap"), sceneG=$("kScene"), barG=$("kBar"), bubL=$("kBub"), pssL=$("kPss"), fade=$("kFade");
+const svg=$("kinoSvg"), mapG=$("kMap"), sceneG=$("kScene"), barG=$("kBar"), bubL=$("kBub"), pssL=$("kPss"), haL=$("kHa"), fade=$("kFade");
 const van=$("kVan"), vanB=$("kVanB"), vanH=$("kVanH"), car=$("kCar");
 const capEl=$("kinoCap"), cover=$("kinoCover"), askEl=$("kinoAsk"), fxEl=$("kinoFx");
 function mk(p,ghost){ const g=document.createElementNS(NS,"g"); g.setAttribute("class","ka"); g.dataset.p=p;
@@ -313,7 +328,7 @@ const G=mk(GHOST,true); $("kGl").appendChild(G.el);
 /* ---------- laikas: visi judesiai eina per vieną laikrodį, todėl veikia pauzė ir peršokimas ---------- */
 const E={lin:p=>p, io:p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2, out:p=>1-Math.pow(1-p,3), inn:p=>p*p*p};
 const CANCEL={};
-let playing=false, visible=true, started=false, vt=0, last=0, raf=0, stage=0, view="map", puddles=0, lpg=0, km=0, askNo=null;
+let playing=false, visible=true, started=false, vt=0, last=0, raf=0, stage=0, view="map", puddles=0, lpg=0, km=0, cigs=0, wcs=0, inWc=false, askNo=null;
 const tweens=new Set();
 function frame(t){ raf=0; if(!playing||!visible) return; const dt=Math.min(50,t-last); last=t; vt+=dt*SPEED;
   tweens.forEach(w=>{ const p=w.dur>0?Math.min(1,(vt-w.t0)/w.dur):1;
@@ -327,7 +342,12 @@ const bg=p=>{ p.catch(()=>{}) };
 function cancel(){ const old=[...tweens]; tweens.clear(); old.forEach(w=>w.no(CANCEL)); if(askNo){ const f=askNo; askNo=null; f(CANCEL) } askEl.hidden=true }
 
 /* ---------- pagalbininkai ---------- */
-const CAMV=[352,905,1.42], CAMB=[862,935,1.42], CAMW=[540,800,1];
+const CAMV=[352,905,1.42], CAMB=[862,935,1.42], CAMS=[950,930,1.18], CAMW=[540,800,1];
+const STX=1302, STY=912;                                                // Thūlės vieta prie degalinės tualeto durų
+const hasSt=i=>i>0&&i<N&&(i%3===2||STOPS[i].prop==="lpgYes");            // degalinė: kas trečias sustojimas ir ten, kur pilam dujas
+const stCount=i=>STOPS.slice(0,i).filter((_,j)=>hasSt(j)).length;
+const stDoor=open=>{ $("kStOpen").style.display=open?"":"none" };
+function stBusy(on){ inWc=on; $("kStBusy").setAttribute("fill",on?"#e03131":"#2f9e44"); $("kStBusyT").textContent=on?"UŽIMTA":"LAISVA" }
 let cam={x:540,y:800,z:1};
 function setCam(x,y,z){ cam={x,y,z}; const t=`translate(${(540-x*z).toFixed(1)} ${(800-y*z).toFixed(1)}) scale(${z.toFixed(3)})`; $("kCam").setAttribute("transform",t); $("kCam2").setAttribute("transform",t) }
 const camTo=(c,dur)=>{ const o=cam; return tw(dur,e=>setCam(o.x+(c[0]-o.x)*e,o.y+(c[1]-o.y)*e,o.z+(c[2]-o.z)*e)) };
@@ -341,10 +361,11 @@ const headIn=(p,on)=>{ const h=svg.querySelector(`.kh[data-p="${p}"]`); if(h) h.
 function setVan(x,tilt,dy){ van._x=x; van.setAttribute("transform",`translate(${x.toFixed(1)} ${VY}) scale(${VS})`); vanB.setAttribute("transform",`translate(0 ${(dy||0).toFixed(1)}) rotate(${(tilt||0).toFixed(2)} 322 166)`) }
 const door=o=>$("kDoor").setAttribute("opacity",o);
 function setPud(k){ $("kPudG").setAttribute("transform",`translate(880 1124) scale(${k.toFixed(3)})`); $("kTr").setAttribute("opacity",Math.min(1,k*3).toFixed(2)) }
-function setView(v){ view=v; mapG.style.display=v==="map"?"":"none"; sceneG.style.display=v==="scene"?"":"none"; barG.style.display=v==="bar"?"":"none"; bubL.innerHTML="" }
+function setView(v){ view=v; mapG.style.display=v==="map"?"":"none"; sceneG.style.display=v==="scene"?"":"none"; barG.style.display=v==="bar"?"":"none"; bubL.innerHTML=""; haL.innerHTML="" }
 async function cut(v){ if(view===v) return; await tw(170,e=>fade.setAttribute("opacity",e.toFixed(2)),E.lin); setView(v); await tw(210,e=>fade.setAttribute("opacity",(1-e).toFixed(2)),E.lin) }
 function cap(t){ capEl.innerHTML=t?`<span>${esc(t)}</span>`:"" }
-function hud(){ $("kHudP").textContent=puddles; $("kHudL").textContent=lpg; $("kHudK").textContent=Math.round(km) }
+function hud(){ $("kHudP").textContent=puddles; $("kHudL").textContent=lpg; $("kHudK").textContent=Math.round(km);
+  const c=$("kHudC"), w=$("kHudW"); if(c) c.textContent=cigs; if(w) w.textContent=wcs }
 function fxBurst(ux,uy,em,n){ const k=box.clientWidth/W; if(!k) return; [ux,uy]=scr(ux,uy);
   for(let i=0;i<(n||6);i++){ const e=document.createElement("span"), a=-Math.PI/2+(Math.random()-.5)*2.4, d=(150+Math.random()*170)*k;
     e.className="suv-em"; e.textContent=em; e.style.left=ux*k+"px"; e.style.top=uy*k+"px"; e.style.fontSize=Math.max(16,52*k)+"px"; e.style.animationDelay=i*40+"ms";
@@ -364,7 +385,8 @@ async function walk(a,x,y,dur){ const x0=a.x,y0=a.y,n=Math.max(2,Math.round(Math
 async function hop(a,x,y,h,dur,s1){ const x0=a.x,y0=a.y,s0=a.s; if(s1==null) s1=s0;
   await tw(dur,(e,p)=>setPos(a,x0+(x-x0)*p,y0+(y-y0)*p-Math.sin(p*Math.PI)*h,s0+(s1-s0)*p),E.lin) }
 const floatTo=(a,x,y,dur)=>{ const x0=a.x,y0=a.y; return tw(dur,e=>setPos(a,x0+(x-x0)*e,y0+(y-y0)*e)) };
-function hopAll(){ CREW.forEach((p,k)=>setTimeout(()=>{ const w=AC[p].w; w.classList.remove("kpk"); w.getBoundingClientRect(); w.classList.add("kpk") },k*60)) }
+function anim(el,c){ el.classList.remove("kpk","klol"); el.getBoundingClientRect(); el.classList.add(c) }
+function hopAll(){ CREW.forEach((p,k)=>setTimeout(()=>anim(AC[p].w,"kpk"),k*60)) }
 function floaty(x,y,txt,dy,dur){ const t=document.createElementNS(NS,"text"); t.setAttribute("class","kpss"); t.setAttribute("text-anchor","middle"); t.textContent=txt; pssL.appendChild(t);
   return tw(dur,(e,p)=>{ t.setAttribute("x",x); t.setAttribute("y",(y+dy*e).toFixed(1)); t.setAttribute("opacity",(p<.15?p/.15:p>.7?(1-p)/.3:1).toFixed(2)) },E.out).then(()=>t.remove(),e=>{ t.remove(); throw e }) }
 
@@ -383,7 +405,8 @@ function prep(i){ const s=STOPS[i], k=SKY[s.sky];
   const o=$("kOrb"); o.setAttribute("cx",k[6][0]); o.setAttribute("cy",k[6][1]); o.setAttribute("r",k[6][2]); o.setAttribute("fill",k[6][3]);
   $("kLand").innerHTML=LAND[s.id]||""; $("kProps").innerHTML=PROP[s.prop]||""; $("kHose").style.display="none";
   $("kCity").textContent=s.n.toUpperCase(); $("kCSub").textContent=`${s.land} · ${i?"~"+s.km+" km":"startas"} · sustojimas ${i+1} iš ${N}`;
-  pssL.innerHTML=""; setPud(0); door(0); van.classList.remove("kroll"); setCam(...CAMW);
+  pssL.innerHTML=""; $("kButts").innerHTML=""; setPud(0); door(0); van.classList.remove("kroll"); setCam(...CAMW);
+  $("kStation").style.display=hasSt(i)?"":"none"; $("kStB").removeAttribute("transform"); $("kStWin").setAttribute("fill",s.sky>=4?"#ffe59a":"#a5d8ff"); stDoor(false); stBusy(false);
   CREW.forEach(p=>{ const a=AC[p]; $("kAct").appendChild(a.el); show(a,false); rock(a,0,0); headIn(p,true); setPos(a,0,0,CS) });
   $("kGl").appendChild(G.el); show(G,true); setVan(-680,0,0); setPos(G,-680+GX,GY,1.25);
   km=s.km; hud() }
@@ -396,15 +419,26 @@ async function arrive(){ van.classList.add("kroll");
 async function exitAll(ord){ door(1); bg(camTo(CAMV,650));
   await Promise.all(ord.map((p,k)=>wait(k*170).then(async()=>{ const a=AC[p]; headIn(p,false); setPos(a,DOORX,DOORY,.75); show(a,true);
     await hop(a,SPOT[k][0],SPOT[k][1],78,430,CS); await tw(160,(e,q)=>rock(a,0,Math.sin(q*Math.PI)*7),E.lin); rock(a,0,0) }))) }
-async function toBush(ord){ bg(floatTo(G,884,700,1200)); bg(camTo(CAMB,1250));
-  await Promise.all(ord.map((p,k)=>wait(k*90).then(()=>walk(AC[p],BX[5-k],BYY+(k%2)*8,1050+k*40)))) }
-async function pee(i,s){ const size=.5+.05*i, words=s.notes?["♪","♫","la-laaa","♪"]:["pššš","čiurrr","pšššš","aaach"];
+async function toWc(a){ $("kFront").appendChild(a.el); bg(say(a,rnd(["Aš į degalinę!","Man rimtesnis reikalas","Kur čia WC? KIJA!"]),1100));
+  await walk(a,690,1018,560); await walk(a,1140,1004,480); await walk(a,STX,STY,300);
+  stDoor(true); await tw(240,e=>setPos(a,STX,STY-8*e,CS*(1-.2*e))); show(a,false); setPos(a,STX,STY,CS); stDoor(false); stBusy(true) }
+async function fromWc(a,k){ stBusy(false); stDoor(true); setPos(a,STX,STY-8,CS*.8); show(a,true); await tw(220,e=>setPos(a,STX,STY-8+8*e,CS*(.8+.2*e))); stDoor(false);
+  bg(say(a,rnd(["Palengvėjo. KIJA!","Kaip naujas!","Degalinė užskaityta"]),1200));
+  await walk(a,1140,1004,300); await walk(a,690,1018,500); await walk(a,SPOT[k][0],SPOT[k][1],480); $("kAct").appendChild(a.el) }
+async function wcShow(){ const B=$("kStB"), w=["prrrt","pliumpt","ufff…","💩"];
+  bg(wait(300).then(()=>sayAt(STX-30,STY-170,"Užimta!",1100)));
+  [0,1,2,3].forEach(k=>bg(wait(250+k*380).then(()=>floaty(STX-150+k*62,STY-240,w[k],-100,1000))));
+  await tw(1800,(e,p)=>B.setAttribute("transform",`translate(${(Math.sin(p*46)*4).toFixed(1)} 0) rotate(${(Math.sin(p*33)*1.1).toFixed(2)})`),E.lin); B.removeAttribute("transform");
+  wcs++; hud(); fxBurst(STX-40,STY-120,"🧻",4) }
+async function toBush(ord,st){ bg(floatTo(G,884,700,1200)); bg(camTo(st?CAMS:CAMB,1250));
+  await Promise.all(ord.map((p,k)=>wait(k*90).then(()=>st&&p==="Thūlė"?toWc(AC[p]):walk(AC[p],BX[5-k],BYY+(k%2)*8,1050+k*40)))) }
+async function pee(i,s,st){ const size=.5+.05*i, words=s.notes?["♪","♫","la-laaa","♪"]:["pššš","čiurrr","pšššš","aaach"];
   const fl=[0,1,2,3].map(k=>wait(k*260).then(()=>floaty(740+k*88,s.notes?930:1010,words[k],s.notes?-170:-120,1300)));
   bg(wait(500).then(()=>say(G,s.sky>=5?"Aš jums pašviesiu, uuuu…":rnd(["Man nereikia. Aš dvasia.","Aš palauksiu čia, uuuu…","Dvasios krūmų nelanko"]),1500)));
-  await Promise.all([tw(1900,e=>setPud(size*e),E.out),...fl]);
+  await Promise.all([tw(1900,e=>setPud(size*e),E.out),...fl,st?wcShow():0]);
   puddles++; hud(); fxBurst(880,1090,"💧",5) }
-async function fromBush(ord){ bg(floatTo(G,VX+GX,GY,1100)); bg(camTo(CAMV,1100));
-  await Promise.all(ord.map((p,k)=>wait((5-k)*70).then(()=>walk(AC[p],SPOT[k][0],SPOT[k][1],900+k*30)))) }
+async function fromBush(ord,st){ bg(floatTo(G,VX+GX,GY,1100)); bg(wait(st?520:0).then(()=>camTo(CAMV,1100)));
+  await Promise.all(ord.map((p,k)=>st&&p==="Thūlė"?fromWc(AC[p],k):wait((5-k)*70).then(()=>walk(AC[p],SPOT[k][0],SPOT[k][1],900+k*30)))) }
 async function enterAll(ord){ door(1);
   await Promise.all(ord.map((p,k)=>wait((5-k)*150).then(async()=>{ const a=AC[p]; await hop(a,DOORX,DOORY,70,330,.75); show(a,false); headIn(p,true) })));
   door(0) }
@@ -412,6 +446,40 @@ async function leave(){ $("kHose").style.display="none"; bg(camTo(CAMW,520)); aw
   bg(sayAt(VX+520,VY+20,"PYP PYYYP!",700)); await tw(240,(e,p)=>setVan(VX,0,-Math.sin(p*Math.PI)*12),E.lin);
   van.classList.add("kroll"); fxBurst(60,1000,"💨",3);
   await tw(950,e=>{ const x=VX+1180*e; setVan(x,-1.2*e,0); setPos(G,x+GX,GY) },E.inn); van.classList.remove("kroll") }
+
+/* ---------- Modė: išlipęs ant greičio surūko 3 cigaretes ir kiekvieną sutrypia batu ---------- */
+const CIG=`<g transform="translate(7 13) rotate(12)"><rect x="0" y="-3.2" width="30" height="6.4" rx="2" fill="#fff" stroke="#868e96" stroke-width=".9"/><rect x="23" y="-3.2" width="8" height="6.4" rx="2" fill="#ff6b00"/></g>`;
+function puff(x,y){ const c=document.createElementNS(NS,"circle"), dx=16+Math.random()*26; c.setAttribute("fill","#e9ecef"); pssL.appendChild(c);
+  return tw(820,(e,p)=>{ c.setAttribute("cx",(x+dx*e).toFixed(1)); c.setAttribute("cy",(y-80*e).toFixed(1)); c.setAttribute("r",(5+13*e).toFixed(1)); c.setAttribute("opacity",((1-p)*.85).toFixed(2)) },E.out).then(()=>c.remove(),e=>{ c.remove(); throw e }) }
+async function smoke(a){ const c=document.createElementNS(NS,"g"); c.innerHTML=CIG; $("kAct").appendChild(a.el);
+  try{ await walk(a,a.x+6,a.y+60,210); const fy=a.y+70*a.s+6;            // žingsnis į priekį, kad visi matytų
+    for(let n=0;n<3;n++){ a.inn.appendChild(c);
+      bg(puff(a.x+56,a.y+18)); bg(wait(150).then(()=>puff(a.x+60,a.y+14))); bg(floaty(a.x+6,a.y-66,"🚬 "+(n+1),-56,700));
+      await wait(380); c.remove();
+      const b=document.createElementNS(NS,"g"), bx=a.x-24+n*26, x0=a.x+40, y0=a.y+22;
+      b.innerHTML=`<rect x="-13" y="-4" width="26" height="8" rx="2.5" fill="#fff" stroke="#868e96" stroke-width="1"/><rect x="5" y="-4" width="8" height="8" rx="2.5" fill="#ff6b00"/>`; $("kButts").appendChild(b);
+      await tw(160,e=>b.setAttribute("transform",`translate(${(x0+(bx-x0)*e).toFixed(1)} ${(y0+(fy-y0)*e*e).toFixed(1)}) rotate(${(200*e).toFixed(0)})`),E.lin);
+      await tw(220,(e,p)=>rock(a,9*Math.sin(p*Math.PI),-30*Math.sin(p*Math.PI)),E.lin); rock(a,0,0);
+      b.innerHTML=`<ellipse rx="16" ry="4" fill="#adb5bd" stroke="#495057" stroke-width="1"/><ellipse cx="6" rx="5" ry="2.4" fill="#495057"/>`; b.setAttribute("transform",`translate(${bx} ${fy})`);
+      bg(floaty(bx+40,fy+6,"TREPT!",-40,520)); cigs++; hud(); await wait(60) }
+  } finally { c.remove(); rock(a,0,0) } }
+
+/* ---------- juokas: visi juokiasi kas kelias sekundes, visą filmuką ---------- */
+const HA=["HA HA HA!","hahaha!","hahah!","CHA CHA CHA!","ha ha ha!","hahaha 😂","achachaaa!","hi hi hi!"];
+function haha(x,y,world,txt,lane){ const t=document.createElementNS(NS,"text"), r=Math.random()*20-10, dx=Math.random()*40-20, k=world?1/cam.z:1; y-=(lane||0)*46*k;
+  t.setAttribute("class","bf kha"+(lane==null&&txt?" g":"")); t.setAttribute("text-anchor","middle"); t.textContent=txt||rnd(HA); (world?pssL:haL).appendChild(t);
+  return tw(1200,(e,p)=>{ t.setAttribute("transform",`translate(${(x+dx*e).toFixed(1)} ${(y-95*k*e).toFixed(1)}) rotate(${r.toFixed(1)}) scale(${(k*(.5+.5*Math.min(1,p*6))).toFixed(3)})`);
+    t.setAttribute("opacity",(p>.7?(1-p)/.3:1).toFixed(2)) },E.out).then(()=>t.remove(),e=>{ t.remove(); throw e }) }
+const pick3=a=>a.slice().sort(()=>Math.random()-.5).slice(0,3);
+const ha3=()=>pick3(HA);
+function laugh(){
+  if(view==="map"){ bg(haha(car._x,car._y-54)); bg(wait(300).then(()=>haha(car._x+(Math.random()<.5?-70:70),car._y-24))); return }
+  const world=view==="scene", out=CREW.filter(p=>AC[p].el.style.display!=="none");
+  const tx=ha3();
+  if(out.length){ out.forEach(p=>anim(AC[p].w,"klol")); pick3(out).forEach((p,k)=>{ const a=AC[p]; bg(wait(k*50).then(()=>haha(a.x,a.y-54*a.s,world,tx[k],k))) }) }
+  else if(world){ anim(vanH,"klol"); pick3(CREW).forEach((p,k)=>bg(wait(k*50).then(()=>haha((van._x||0)+SEAT[p]*VS,VY+34,true,tx[k],k)))) }
+  if(Math.random()<.3) bg(wait(380).then(()=>haha(G.x,G.y-72*G.s,world,rnd(["hu hu huuu…","uhuhuuu!","bū-cha-cha!"])))) }
+async function laughLoop(){ try{ await wait(900); for(;;){ laugh(); await wait(2100+Math.random()*1300) } }catch(e){} }
 
 /* ---------- kiekvieno sustojimo pokštas ---------- */
 const refuel=async(who,txt)=>{ $("kHose").style.display=""; bg(Promise.all([0,1,2].map(k=>wait(k*300).then(()=>floaty(600+k*26,900,"glu",-90,900))))); await say(AC[who],txt,1400) };
@@ -426,12 +494,14 @@ const TW={
  ingolstadt:async()=>{ await say(G,"Tamsoje aš gražesnis, uuuu…",1500) },
  munchen:async()=>{ hopAll(); fxBurst(540,820,"🎉",10); await say(AC["Kvedaravičius"],"MES MIUNCHENE!",1400) }
 };
-async function stopScene(i){ const s=STOPS[i], ord=order(i); prep(i); await cut("scene"); cap(s.cap[0]);
+async function stopScene(i){ const s=STOPS[i], ord=order(i), st=hasSt(i); prep(i); await cut("scene"); cap(s.cap[0]);
   await arrive(); await wait(350); await exitAll(ord);
   if(s.lpg){ lpg++; hud() }
+  const sm=smoke(AC["Modė"]); bg(sm);
   if(TW[s.id]) await TW[s.id]();
-  cap(s.cap[1]); await toBush(ord); await pee(i,s);
-  cap(s.cap[2]); await wait(600); await fromBush(ord);
+  await sm;
+  cap(s.cap[1]); await toBush(ord,st); await pee(i,s,st);
+  cap(s.cap[2]); await wait(600); await fromBush(ord,st);
   if(i===N-1){ hopAll(); fxBurst(330,880,"🍻",8); await wait(1300); return }
   await enterAll(ord); await leave() }
 async function startScene(){ const s=STOPS[0], ord=order(0); prep(0); setVan(VX,0,0);
@@ -473,26 +543,26 @@ async function barScene(){ ord0().forEach((p,k)=>{ const a=AC[p]; $("kBarAct").a
 const ord0=()=>["Simonas","Thūlė","Deksnys","Kvedaravičius","Modė","Vacys"];
 function endCard(){ playing=false; stage=N+1; cap("");
   cover.innerHTML=`<div class="kc-k">2 DIENOS PABAIGA</div><div class="kc-t">Mes Miunchene! 🍻</div>
-<div class="kc-list"><span>~660 km vietoj 590</span><span>8 val. vietoj 6</span><span>3 žemės</span><span>💧 ${N-1} balos</span><span>⛽ 3 dujų paieškos</span><span>🍖 1 karka</span><span>👻 1 dvasia</span></div>
+<div class="kc-list"><span>~660 km vietoj 590</span><span>8 val. vietoj 6</span><span>3 žemės</span><span>💧 ${N-1} balos</span><span>🚬 ${3*(N-1)} Modės cigaretės</span><span>🧻 ${stCount(N)} Thūlės degalinės</span><span>⛽ 3 dujų paieškos</span><span>🍖 1 karka</span><span>👻 1 dvasia</span></div>
 <div class="kc-s">Išvada: Vokietija didelė, autobanai greiti, bet kelionės planą kartais sudarinėja ne navigacija, o dujų kolonėlės ir žmogaus fiziologija. 😂</div>
 <button type="button" class="kc-play" id="kinoStart">🔁 Žiūrėti dar kartą</button>`;
   cover.hidden=false; ui(); kick() }
 
 /* ---------- eiga ---------- */
-async function main(from){ try{
-    for(let i=from;i<N;i++){ stage=i; puddles=Math.max(0,i-1); lpg=STOPS.slice(1,i).filter(s=>s.lpg).length; km=STOPS[i].km; hud(); mapState(i,CUM[i]);
+async function main(from){ bg(laughLoop()); try{
+    for(let i=from;i<N;i++){ stage=i; puddles=Math.max(0,i-1); cigs=3*puddles; wcs=stCount(i); lpg=STOPS.slice(1,i).filter(s=>s.lpg).length; km=STOPS[i].km; hud(); mapState(i,CUM[i]);
       await (i===0?startScene():stopScene(i)); if(i<N-1){ if(i===0) await choose(); await drive(i) } }
-    if(from<=N){ stage=N; puddles=N-1; lpg=3; mapState(N,TOTAL); await barScene() }
+    if(from<=N){ stage=N; puddles=N-1; cigs=3*(N-1); wcs=stCount(N); lpg=3; mapState(N,TOTAL); await barScene() }
     endCard();
   }catch(e){ if(e!==CANCEL) console.error(e) } }
-function go(i){ cancel(); started=true; cover.hidden=true; fade.setAttribute("opacity",0); bubL.innerHTML=""; pssL.innerHTML=""; fxEl.innerHTML=""; playing=true; ui(); kick(); main(i) }
+function go(i){ cancel(); started=true; cover.hidden=true; fade.setAttribute("opacity",0); bubL.innerHTML=""; pssL.innerHTML=""; haL.innerHTML=""; fxEl.innerHTML=""; playing=true; ui(); kick(); main(i) }
 function ui(){ $("kinoPlay").textContent=!started||stage>N?"▶ Paleisti":playing?"⏸ Pauzė":"▶ Tęsti" }
 
 /* ---------- bakstelėjimai ---------- */
 function quip(a,txt){ const b=bubble(a.x,a.y-56*a.s,txt,a.ghost?"g":""); setTimeout(()=>b.remove(),1500) }
 function poke(a){ if(a.ghost){ quip(a,rnd(LINES[GHOST])); hopAll(); return }
-  a.w.classList.remove("kpk"); a.w.getBoundingClientRect(); a.w.classList.add("kpk"); quip(a,rnd(LINES[a.p])) }
-function honk(){ vanH.classList.remove("kpk"); vanH.getBoundingClientRect(); vanH.classList.add("kpk"); const b=bubble((van._x||0)+520,VY+20,rnd(["PYP PYYYP!","PYYYP!","VAROM!"])); setTimeout(()=>b.remove(),900) }
+  anim(a.w,"kpk"); quip(a,rnd(LINES[a.p])) }
+function honk(){ anim(vanH,"kpk"); const b=bubble((van._x||0)+520,VY+20,rnd(["PYP PYYYP!","PYYYP!","VAROM!"])); setTimeout(()=>b.remove(),900) }
 function bite(auto){ if(bites>=3){ if(!auto) fxBurst(540,960,"🦴",3); return } bites++; setMeat(); fxBurst(540,920,"🍖",4);
   const b=bubble(540,800,bites>=3?"Liko tik kaulas":"Om nom nom"); setTimeout(()=>b.remove(),900) }
 svg.addEventListener("click",e=>{ const t=e.target; let g;
@@ -501,6 +571,7 @@ svg.addEventListener("click",e=>{ const t=e.target; let g;
   if(t.closest("#kMeat")) return bite();
   if(g=t.closest(".kmug")){ fxBurst(MUGX[+g.dataset.i],920,"🍺",3); return }
   if(t.closest("#kPudG")){ fxBurst(880,1110,"💦",6); return }
+  if(t.closest("#kStation")){ const b=bubble(STX-30,STY-170,inWc?rnd(["Užimta!","Tuoj, tuoj!","Popieriaus yra?"]):"Laisva. Thūlė jau buvo?"); setTimeout(()=>b.remove(),1100); return }
   if(t.closest("#kVan")) return honk() });
 cover.addEventListener("click",e=>{ if(e.target.closest("#kinoStart")) go(0) });
 $("kinoPlay").onclick=()=>{ if(!started||stage>N) return go(0); playing=!playing; ui(); kick() };
